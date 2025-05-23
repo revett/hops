@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="./assets/revett-hops-logo-2.png" width="200px">
+  <img src="./assets/revett-hops-logo-2.png" width="250px">
 </p>
 
 # hops
