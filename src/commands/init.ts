@@ -5,6 +5,7 @@ import { access, writeFile } from "fs/promises";
 import { constants } from "fs";
 import YAML from "yaml";
 import { getConfigPath } from "../utils/config";
+import { exists } from "../utils/file";
 
 // Default config with a few example packages to illustrate the structure.
 const defaultConfig: Config = {
@@ -12,7 +13,7 @@ const defaultConfig: Config = {
   machines: {
     shared: {
       taps: ["homebrew/bundle"],
-      formula: ["coreutils"],
+      formulae: ["coreutils"],
       casks: ["1password", "raycast", "spotify"],
     },
     personal: { casks: ["adobe-creative-cloud"] },
@@ -23,12 +24,8 @@ const defaultConfig: Config = {
 const action: () => Promise<void> = async () => {
   const path = getConfigPath();
 
-  try {
-    await access(path, constants.F_OK);
-    console.error(`❌ Config file already exists at ${path}`);
-    process.exit(1);
-  } catch {
-    // OK.
+  if (await exists(path)) {
+    throw new Error(`Config file already exists at ${path}`);
   }
 
   const yaml = YAML.stringify(defaultConfig);
@@ -37,8 +34,8 @@ const action: () => Promise<void> = async () => {
     await writeFile(path, yaml, "utf8");
     console.log(`✅ Created hops config at: ${path}`);
   } catch (err) {
-    console.error("❌ Failed to write config:", err);
-    process.exit(1);
+    const msg = err instanceof Error ? err.message : String(err);
+    throw new Error(`Unable to write to config at ${path}: ${msg}`);
   }
 };
 

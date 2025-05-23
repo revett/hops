@@ -19,5 +19,19 @@ commands.forEach((cmd) => {
 });
 
 cli.help();
-cli.parse();
 cli.version(version);
+
+// If no arguments are provided, show the help.
+if (!process.argv.slice(2).length) {
+  cli.outputHelp();
+}
+
+// Find and run the command.
+try {
+  cli.parse(process.argv, { run: false });
+  await cli.runMatchedCommand();
+} catch (err) {
+  const msg = err instanceof Error ? err.message : String(err);
+  console.error(msg);
+  process.exit(1);
+}

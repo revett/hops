@@ -9,20 +9,21 @@ type GenerateOptions = {
 
 const action: (options: GenerateOptions) => Promise<void> = async (options) => {
   if (!options.machine) {
-    console.error("❌ Machine flag is required");
-    process.exit(1);
+    throw new Error("Machine flag is required");
   }
   if (options.machine === "shared") {
-    console.error("❌ Machine flag not allowed: shared");
-    process.exit(1);
+    throw new Error("Machine flag not allowed: shared");
   }
 
   const cfg = await getConfig();
   const { brewfile, machines, metadata } = cfg;
 
   if (!machines[options.machine]) {
-    console.error(`❌ Machine flag not found in hops.yml: ${options.machine}`);
-    process.exit(1);
+    throw new Error(`Machine flag not found in hops.yml: ${options.machine}`);
+  }
+
+  if (!metadata) {
+    throw new Error("Metadata not found in config");
   }
 
   const taps = new Set<string>();
@@ -35,7 +36,7 @@ const action: (options: GenerateOptions) => Promise<void> = async (options) => {
     }
 
     packages.taps?.forEach((tap) => taps.add(tap));
-    packages.formula?.forEach((f) => formulae.add(f));
+    packages.formulae?.forEach((f) => formulae.add(f));
     packages.casks?.forEach((cask) => casks.add(cask));
   }
 
@@ -49,14 +50,14 @@ const action: (options: GenerateOptions) => Promise<void> = async (options) => {
 
   lines.push("# Taps\n");
   if (taps.size > 0) {
-    taps.forEach((tap) => lines.push(`tap "${tap}"`));
+    [...taps].sort().forEach((tap) => lines.push(`tap "${tap}"`));
   } else {
     lines.push("# None.");
   }
 
   lines.push("\n# Formulae\n");
   if (formulae.size > 0) {
-    formulae.forEach((f) => lines.push(`brew "${f}"`));
+    [...formulae].sort().forEach((f) => lines.push(`brew "${f}"`));
   } else {
     lines.push("# None.");
   }
@@ -64,7 +65,7 @@ const action: (options: GenerateOptions) => Promise<void> = async (options) => {
   lines.push("\n# Casks\n");
 
   if (casks.size > 0) {
-    casks.forEach((cask) => lines.push(`cask "${cask}"`));
+    [...casks].sort().forEach((cask) => lines.push(`cask "${cask}"`));
   } else {
     lines.push("# None.");
   }
@@ -78,9 +79,8 @@ const action: (options: GenerateOptions) => Promise<void> = async (options) => {
     await writeFile(brewfile, lines.join("\n"), "utf8");
     console.log(`✅ Brewfile updated`);
   } catch (err) {
-    console.error(`❌ Failed to write Brewfile at ${brewfile}`);
-    console.error(err instanceof Error ? err.message : err);
-    process.exit(1);
+    const msg = err instanceof Error ? err.message : String(err);
+    throw new Error(`Unable to write to Brewfile at ${brewfile}: ${msg}`);
   }
 };
 
