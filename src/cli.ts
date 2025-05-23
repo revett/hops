@@ -1,56 +1,23 @@
 import { cac } from "cac";
-import pkgjson from "../package.json" assert { type: "json" };
+import { commands } from "./commands";
+import pkg from "../package.json" assert { type: "json" };
 
 const cli = cac("hops");
 
-const commands = [
-  {
-    name: "apply",
-    description: "Install and update dependencies",
-    action: () => {
-      console.log("...");
-    },
-  },
-  {
-    name: "generate",
-    description: "Update local Brewfile from YAML config",
-    action: () => {
-      console.log("...");
-    },
-  },
-  {
-    name: "init",
-    description: "Initialize a new YAML config",
-    action: () => {
-      console.log("...");
-    },
-  },
-  {
-    name: "list",
-    description: "List packages for a given profile",
-    action: () => {
-      console.log("...");
-    },
-  },
-  {
-    name: "version",
-    description: "Show the current version",
-    action: () => {
-      console.log(pkgjson.version);
-    },
-  },
-];
+commands.forEach((cmd) => {
+  const command = cli.command(cmd.name, cmd.description);
 
-commands.forEach((command) => {
-  cli.command(command.name, command.description).action(command.action);
+  cmd.options?.forEach((opt) => {
+    if (opt.default !== undefined) {
+      command.option(opt.flags, opt.description, { default: opt.default });
+    } else {
+      command.option(opt.flags, opt.description);
+    }
+  });
+
+  command.action(cmd.action);
 });
 
 cli.help();
 cli.parse();
-
-// If no known command is provided, show help.
-const args = process.argv.slice(2);
-if (args.length === 0 || !cli.matchedCommand) {
-  cli.outputHelp();
-  process.exit(1);
-}
+cli.version(pkg.version);
