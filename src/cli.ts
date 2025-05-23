@@ -1,4 +1,5 @@
 import { cac } from "cac";
+import pkgjson from "../package.json" assert { type: "json" };
 
 const cli = cac("hops");
 
@@ -18,6 +19,13 @@ const commands = [
     },
   },
   {
+    name: "init",
+    description: "Initialize a new YAML config",
+    action: () => {
+      console.log("...");
+    },
+  },
+  {
     name: "list",
     description: "List packages for a given profile",
     action: () => {
@@ -25,10 +33,10 @@ const commands = [
     },
   },
   {
-    name: "init",
-    description: "Initialize a new YAML config",
+    name: "version",
+    description: "Show the current version",
     action: () => {
-      console.log("...");
+      console.log(pkgjson.version);
     },
   },
 ];
