@@ -35,6 +35,7 @@ const action: (options: ApplyOptions) => Promise<void> = async (options) => {
   const config = await getConfig();
   await generateBrewfile(config, options.machine);
 
+  // List packages.
   console.log("\n📦 Listing taps in Brewfile");
   const taps = await homebrew.listTaps(config.brewfile);
   if (taps.length > 0) {
@@ -59,7 +60,7 @@ const action: (options: ApplyOptions) => Promise<void> = async (options) => {
     console.log("- None.");
   }
 
-  // Cleanup
+  // Cleanup packages not in Brewfile.
   console.log("\n🧹 Checking for packages not in Brewfile");
   const floatingDeps = await homebrew.listFloatingDependencies(config.brewfile);
   if (floatingDeps.length > 0) {
@@ -84,7 +85,7 @@ const action: (options: ApplyOptions) => Promise<void> = async (options) => {
     console.log("✅ No packages to remove");
   }
 
-  // Install and upgrade.
+  // Install and upgrade packages.
   console.log("\n📥 Installing and upgrading packages from Brewfile");
   try {
     await homebrew.install(config.brewfile);
