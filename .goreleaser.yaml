@@ -1,0 +1,43 @@
+version: 2
+
+before:
+  hooks:
+    - rm -f hops
+    - make build
+
+builds:
+  - id: hops
+    binary: hops
+    goos:
+      - darwin
+    goarch:
+      - arm64
+    skip: true
+
+archives:
+  - id: hops
+    name_template: "{{ .ProjectName }}-{{ .Os }}-{{ .Arch }}"
+    formats:
+      - tar.gz
+    files:
+      - src: ./hops
+        dst: hops
+        info:
+          mode: 0755
+
+checksum:
+  name_template: "checksums.txt"
+
+changelog:
+  sort: asc
+  filters:
+    exclude:
+      - "^docs:"
+      - "^test:"
+
+release:
+  github:
+    owner: revett
+    name: hops
+  draft: true
+  prerelease: auto
