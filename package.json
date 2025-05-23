@@ -1,6 +1,6 @@
 {
   "name": "hops",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "main": "src/cli.ts",
   "repository": "git@github.com:revett/hops.git",
   "author": "revett <2796074+revett@users.noreply.github.com>",

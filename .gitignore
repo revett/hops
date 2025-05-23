@@ -39,3 +39,5 @@ report.[0-9]_.[0-9]_.[0-9]_.[0-9]_.json
 # Added by @author
 TODO.txt
 hops
+# Added by goreleaser init:
+dist/
