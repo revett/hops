@@ -12,7 +12,7 @@ Managing Homebrew packages with `Brewfile` is great, until you're juggling multi
 Hops replaces scattered, duplicated configurations with a single declarative YAML config.
 
 - ✅ One `hops.yml` config for all machines
-- 📦 Generate a specific `Brewfile` for each machine
+- 📦 Generates a specific `Brewfile` for each machine
 - 🧹 Prune unused floating packages
 - ⚡ Installs, upgrades, and verifies with one command
 - 💻 Designed for dotfiles
@@ -66,8 +66,8 @@ Initialise the configuration file:
 hops init
 ```
 
-This will create `hops.yml` with a set of example packages; update these with your desired set of
-packages and machines. This config file is designed to sit in your dotfiles and sync across all your
+This will create a `hops.yml` with a set of example packages; update these with your desired set of
+machines and packages. This config file is designed to sit in your dotfiles and sync across all your
 machines.
 
 Apply the configuration for a specific machine:
@@ -79,7 +79,7 @@ hops apply --machine work
 
 Hops will take care of:
 
-- Create a local `Brewfile` made up of the correct shared and machine specific packages
+- Creating a local `Brewfile` made up of the correct shared and machine specific packages
 - Install any missing packages
 - Update any outdated packages
 - Remove any floating packages that are not outlined in the `Brewfile`
