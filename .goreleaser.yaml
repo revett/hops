@@ -2,7 +2,6 @@ version: 2
 
 before:
   hooks:
-    - rm -f hops
     - make build
 
 builds:
@@ -16,14 +15,13 @@ builds:
 
 archives:
   - id: hops
+    ids:
+      - hops
     name_template: "{{ .ProjectName }}-{{ .Os }}-{{ .Arch }}"
     formats:
       - tar.gz
     files:
-      - src: ./hops
-        dst: hops
-        info:
-          mode: 0755
+      - hops
 
 checksum:
   name_template: "checksums.txt"
@@ -40,4 +38,3 @@ release:
     owner: revett
     name: hops
   draft: true
-  prerelease: auto
