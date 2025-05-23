@@ -1,26 +1,27 @@
 import type { Command } from "../types/command";
 import type { Config } from "../types/config";
 import { homedir } from "os";
-import { resolve } from "path";
 import { access, writeFile } from "fs/promises";
 import { constants } from "fs";
 import YAML from "yaml";
+import { getConfigPath } from "../utils/config";
 
 // Default config with a few example packages to illustrate the structure.
 const defaultConfig: Config = {
-  shared: {
-    taps: ["homebrew/bundle"],
-    formula: ["coreutils"],
-    casks: ["1password", "raycast", "spotify"],
+  brewfile: `${homedir()}/Brewfile`,
+  machines: {
+    shared: {
+      taps: ["homebrew/bundle"],
+      formula: ["coreutils"],
+      casks: ["1password", "raycast", "spotify"],
+    },
+    personal: { casks: ["adobe-creative-cloud"] },
+    work: { casks: ["loom", "slack"] },
   },
-  personal: { casks: ["adobe-creative-cloud"] },
-  work: { casks: ["loom", "slack"] },
 };
 
-const action = async (options: Record<string, any>) => {
-  console.log(options);
-
-  const path = resolve(options.path || `${homedir()}/hops.yml`);
+const action: () => Promise<void> = async () => {
+  const path = getConfigPath();
 
   try {
     await access(path, constants.F_OK);
@@ -43,13 +44,6 @@ const action = async (options: Record<string, any>) => {
 
 export const init: Command = {
   name: "init",
-  description: "Initialize a new YAML config.",
-  options: [
-    {
-      flags: "--path <path>",
-      description: "Path to config file.",
-      default: `${homedir()}/hops.yml`,
-    },
-  ],
+  description: "Initialize a new YAML config",
   action,
 };
