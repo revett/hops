@@ -1,10 +1,10 @@
-export type Command = {
+export type Command<T = Record<string, unknown>> = {
   name: string;
   description: string;
   options?: {
     flags: string;
     description: string;
-    default?: any;
+    default?: string;
   }[];
-  action: (options: Record<string, any>) => Promise<void> | void;
+  action: (options: T) => void | Promise<void>;
 };

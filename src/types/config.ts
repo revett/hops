@@ -1,7 +1,14 @@
 export type Config = {
-  [section: string]: {
-    taps?: string[];
-    formula?: string[];
-    casks?: string[];
+  brewfile: string;
+  machines: {
+    [section: string]: {
+      taps?: readonly string[];
+      formula?: readonly string[];
+      casks?: readonly string[];
+    };
+  };
+  metadata: {
+    path: string;
+    version: string;
   };
 };

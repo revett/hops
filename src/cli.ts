@@ -1,6 +1,6 @@
 import { cac } from "cac";
 import { commands } from "./commands";
-import pkg from "../package.json" assert { type: "json" };
+import { version } from "./utils/version";
 
 const cli = cac("hops");
 
@@ -20,4 +20,4 @@ commands.forEach((cmd) => {
 
 cli.help();
 cli.parse();
-cli.version(pkg.version);
+cli.version(version);
