@@ -3,11 +3,11 @@ export type Config = {
   machines: {
     [section: string]: {
       taps?: readonly string[];
-      formula?: readonly string[];
+      formulae?: readonly string[];
       casks?: readonly string[];
     };
   };
-  metadata: {
+  metadata?: {
     path: string;
     version: string;
   };
