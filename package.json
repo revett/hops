@@ -1,0 +1,15 @@
+{
+  "name": "hops",
+  "version": "0.0.1",
+  "main": "src/cli.ts",
+  "repository": "git@github.com:revett/hops.git",
+  "author": "revett <2796074+revett@users.noreply.github.com>",
+  "license": "MIT",
+  "private": true,
+  "dependencies": {
+    "cac": "^6.7.14"
+  },
+  "devDependencies": {
+    "@types/bun": "latest"
+  }
+}
