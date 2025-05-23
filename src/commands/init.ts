@@ -1,11 +1,10 @@
 import type { Command } from "../types/command";
 import type { Config } from "../types/config";
-import { homedir } from "os";
-import { access, writeFile } from "fs/promises";
-import { constants } from "fs";
-import YAML from "yaml";
 import { getConfigPath } from "../utils/config";
-import { exists } from "../utils/file";
+import { fileExists } from "../utils/file";
+import { homedir } from "os";
+import { writeFile } from "fs/promises";
+import YAML from "yaml";
 
 // Default config with a few example packages to illustrate the structure.
 const defaultConfig: Config = {
@@ -24,7 +23,7 @@ const defaultConfig: Config = {
 const action: () => Promise<void> = async () => {
   const path = getConfigPath();
 
-  if (await exists(path)) {
+  if (await fileExists(path)) {
     throw new Error(`Config file already exists at ${path}`);
   }
 
@@ -41,6 +40,6 @@ const action: () => Promise<void> = async () => {
 
 export const init: Command = {
   name: "init",
-  description: "Initialize a new YAML config",
+  description: "Initialize new hops.yml config",
   action,
 };
