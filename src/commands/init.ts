@@ -38,8 +38,8 @@ const action: () => Promise<void> = async () => {
   }
 };
 
-export const init: Command = {
+export const init = {
   name: "init",
   description: "Initialize new hops.yml config",
   action,
-};
+} satisfies Command;

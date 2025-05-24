@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="./assets/revett-hops-logo.png" width="250px">
+  <img src="./assets/logo.png" width="250px">
 </p>
 
 # hops
@@ -61,7 +61,7 @@ hops -h
 Optionally set the `HOPS_CONFIG` environment variable within your terminal profile:
 
 ```bash
-# Defaults to ~/hops.yml if not set.
+# Defaults to ~/hops.yml if not set
 export HOPS_CONFIG=/path/to/hops.yml
 ```
 
@@ -92,13 +92,13 @@ Hops will take care of:
 ## Commands
 
 ```bash
-# Initialize a new hops.yml configuration file with examples.
+# Initialize a new hops.yml configuration file with examples
 hops init
 
-# Generate a local Brewfile for a specific machine without installing anything.
+# Generate a local Brewfile for a specific machine without installing anything
 hops generate --machine work
 
-# Generate Brewfile and apply changes via Homebrew commands (install, upgrade, cleanup).
+# Generate Brewfile and apply changes via Homebrew commands (install, upgrade, cleanup)
 hops apply --machine personal
 ```
 

@@ -41,7 +41,7 @@ export const getConfig = async (): Promise<Config> => {
 };
 
 export const getConfigPath = (): string => {
-  const input = process.env.HOPS_CONFIG?.trim();
+  const input = process.env["HOPS_CONFIG"]?.trim();
 
   if (!input || input === "") {
     console.warn(

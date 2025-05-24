@@ -20,7 +20,7 @@ const action: (options: GenerateOptions) => Promise<void> = async (options) => {
   await generateBrewfile(config, options.machine);
 };
 
-export const generate: Command<GenerateOptions> = {
+export const generate = {
   name: "generate",
   description: "Generate Brewfile using hops.yml",
   options: [
@@ -30,4 +30,4 @@ export const generate: Command<GenerateOptions> = {
     },
   ],
   action,
-};
+} satisfies Command<GenerateOptions>;

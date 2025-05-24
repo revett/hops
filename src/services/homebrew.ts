@@ -1,4 +1,5 @@
 import { $ } from "bun";
+import { Result, ok, err } from "neverthrow";
 
 function createEnv(brewfilePath: string): Record<string, string> {
   const env: Record<string, string> = {};
@@ -8,47 +9,74 @@ function createEnv(brewfilePath: string): Record<string, string> {
       env[key] = value;
     }
   }
-  env.HOMEBREW_BUNDLE_FILE = brewfilePath;
+  env["HOMEBREW_BUNDLE_FILE"] = brewfilePath;
 
   return env;
 }
 
-export async function listCasks(brewfilePath: string): Promise<string[]> {
+export async function listCasks(
+  brewfilePath: string
+): Promise<Result<string[], Error>> {
   try {
     const result = await $`brew bundle list --casks`
       .env(createEnv(brewfilePath))
       .quiet();
-    return result.text().trim().split("\n").filter(Boolean);
-  } catch {
-    return [];
+    const casks = result.text().trim().split("\n").filter(Boolean);
+    return ok(casks);
+  } catch (error) {
+    return err(
+      new Error(
+        `Listing casks: ${
+          error instanceof Error ? error.message : String(error)
+        }`
+      )
+    );
   }
 }
 
-export async function listFormulae(brewfilePath: string): Promise<string[]> {
+export async function listFormulae(
+  brewfilePath: string
+): Promise<Result<string[], Error>> {
   try {
     const result = await $`brew bundle list --brews`
       .env(createEnv(brewfilePath))
       .quiet();
-    return result.text().trim().split("\n").filter(Boolean);
-  } catch {
-    return [];
+    const formulae = result.text().trim().split("\n").filter(Boolean);
+    return ok(formulae);
+  } catch (error) {
+    return err(
+      new Error(
+        `Listing formulae: ${
+          error instanceof Error ? error.message : String(error)
+        }`
+      )
+    );
   }
 }
 
-export async function listTaps(brewfilePath: string): Promise<string[]> {
+export async function listTaps(
+  brewfilePath: string
+): Promise<Result<string[], Error>> {
   try {
     const result = await $`brew bundle list --taps`
       .env(createEnv(brewfilePath))
       .quiet();
-    return result.text().trim().split("\n").filter(Boolean);
-  } catch {
-    return [];
+    const taps = result.text().trim().split("\n").filter(Boolean);
+    return ok(taps);
+  } catch (error) {
+    return err(
+      new Error(
+        `Listing taps: ${
+          error instanceof Error ? error.message : String(error)
+        }`
+      )
+    );
   }
 }
 
 export async function listFloatingDependencies(
   brewfilePath: string
-): Promise<string[]> {
+): Promise<Result<string[], Error>> {
   try {
     const result = await $`brew bundle cleanup`
       .env(createEnv(brewfilePath))
@@ -59,7 +87,7 @@ export async function listFloatingDependencies(
 
     // If empty output or explicitly says nothing to uninstall, return empty array
     if (!output || output === "") {
-      return [];
+      return ok([]);
     }
 
     const packages: string[] = [];
@@ -86,25 +114,65 @@ export async function listFloatingDependencies(
       }
     }
 
-    return packages;
-  } catch {
-    return [];
+    return ok(packages);
+  } catch (error) {
+    return err(
+      new Error(
+        `Listing floating dependencies: ${
+          error instanceof Error ? error.message : String(error)
+        }`
+      )
+    );
   }
 }
 
-export async function forceCleanup(brewfilePath: string): Promise<void> {
-  await $`brew bundle --force cleanup`.env(createEnv(brewfilePath));
+export async function forceCleanup(
+  brewfilePath: string
+): Promise<Result<void, Error>> {
+  try {
+    await $`brew bundle --force cleanup`.env(createEnv(brewfilePath));
+    return ok(undefined);
+  } catch (error) {
+    return err(
+      new Error(
+        `Removing floating dependencies: ${
+          error instanceof Error ? error.message : String(error)
+        }`
+      )
+    );
+  }
 }
 
-export async function install(brewfilePath: string): Promise<void> {
-  await $`brew bundle install`.env(createEnv(brewfilePath));
+export async function install(
+  brewfilePath: string
+): Promise<Result<void, Error>> {
+  try {
+    await $`brew bundle install`.env(createEnv(brewfilePath));
+    return ok(undefined);
+  } catch (error) {
+    return err(
+      new Error(
+        `Installing/updating packages: ${
+          error instanceof Error ? error.message : String(error)
+        }`
+      )
+    );
+  }
 }
 
-export async function check(brewfilePath: string): Promise<boolean> {
+export async function check(
+  brewfilePath: string
+): Promise<Result<boolean, Error>> {
   try {
     await $`brew bundle check`.env(createEnv(brewfilePath)).quiet();
-    return true;
-  } catch {
-    return false;
+    return ok(true);
+  } catch (error) {
+    return err(
+      new Error(
+        `Checking packages: ${
+          error instanceof Error ? error.message : String(error)
+        }`
+      )
+    );
   }
 }
