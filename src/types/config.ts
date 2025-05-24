@@ -1,14 +1,14 @@
+export type Machine = {
+  readonly taps?: readonly string[];
+  readonly formulae?: readonly string[];
+  readonly casks?: readonly string[];
+};
+
 export type Config = {
-  brewfile: string;
-  machines: {
-    [section: string]: {
-      taps?: readonly string[];
-      formulae?: readonly string[];
-      casks?: readonly string[];
-    };
-  };
+  readonly brewfile: string;
+  readonly machines: Record<string, Machine>;
   metadata?: {
-    path: string;
-    version: string;
+    readonly path: string;
+    readonly version: string;
   };
 };
