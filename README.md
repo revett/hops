@@ -109,11 +109,8 @@ See [hops.yml](https://github.com/revett/dotfiles/blob/main/hops.yml) in
 
 ## Releases
 
-Tag the release locally and push to GitHub, then build the release asset, and finally create the
-release by hand in GitHub.
-
-```bash
-git tag -a vX.Y.Z -m "Release vX.Y.Z"
-git push origin vX.Y.Z
-make release VERSION=vX.Y.Z
-```
+1. Bump version in `package.json` and push
+1. `git tag -a vX.Y.Z -m "Release vX.Y.Z"`
+1. `git push origin vX.Y.Z`
+1. `make release VERSION=vX.Y.Z`
+1. Create release in GitHub
