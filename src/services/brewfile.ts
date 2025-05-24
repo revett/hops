@@ -1,19 +1,20 @@
 import type { Config } from "../types/config";
 import { writeFile } from "fs/promises";
 import dayjs from "dayjs";
+import { Result, ok, err } from "neverthrow";
 
 export async function generateBrewfile(
   config: Config,
   machine: string
-): Promise<void> {
+): Promise<Result<void, Error>> {
   const { brewfile, machines, metadata } = config;
 
   if (!machines[machine]) {
-    throw new Error(`Machine flag not found in hops.yml: ${machine}`);
+    return err(new Error(`Machine flag not found in hops.yml: ${machine}`));
   }
 
   if (!metadata) {
-    throw new Error("Metadata not found in config");
+    return err(new Error("Metadata not found in config"));
   }
 
   const taps = new Set<string>();
@@ -68,8 +69,10 @@ export async function generateBrewfile(
   try {
     await writeFile(brewfile, lines.join("\n"), "utf8");
     console.log(`✅ Brewfile updated`);
-  } catch (err) {
-    const msg = err instanceof Error ? err.message : String(err);
-    throw new Error(`Unable to write to Brewfile at ${brewfile}: ${msg}`);
+  } catch (error) {
+    const msg = error instanceof Error ? error.message : String(error);
+    return err(new Error(`Unable to write to Brewfile at ${brewfile}: ${msg}`));
   }
+
+  return ok(undefined);
 }

@@ -33,11 +33,17 @@ const action: (options: ApplyOptions) => Promise<void> = async (options) => {
   console.log(`🖥️ Machine: ${options.machine}`);
 
   const config = await getConfig();
-  await generateBrewfile(config, options.machine);
+  if (config.isErr()) {
+    throw new Error(config.error.message);
+  }
+  const ok = await generateBrewfile(config.value, options.machine);
+  if (ok.isErr()) {
+    throw new Error(ok.error.message);
+  }
 
   // List packages.
   console.log("\n📦 Listing taps in Brewfile");
-  const taps = await homebrew.listTaps(config.brewfile);
+  const taps = await homebrew.listTaps(config.value.brewfile);
   if (taps.isErr()) {
     throw new Error(taps.error.message);
   }
@@ -48,7 +54,7 @@ const action: (options: ApplyOptions) => Promise<void> = async (options) => {
   }
 
   console.log("\n📦 Listing formulae in Brewfile");
-  const formulae = await homebrew.listFormulae(config.brewfile);
+  const formulae = await homebrew.listFormulae(config.value.brewfile);
   if (formulae.isErr()) {
     throw new Error(formulae.error.message);
   }
@@ -59,7 +65,7 @@ const action: (options: ApplyOptions) => Promise<void> = async (options) => {
   }
 
   console.log("\n📦 Listing casks in Brewfile");
-  const casks = await homebrew.listCasks(config.brewfile);
+  const casks = await homebrew.listCasks(config.value.brewfile);
   if (casks.isErr()) {
     throw new Error(casks.error.message);
   }
@@ -71,7 +77,9 @@ const action: (options: ApplyOptions) => Promise<void> = async (options) => {
 
   // Cleanup packages not in Brewfile.
   console.log("\n🧹 Checking for packages not in Brewfile");
-  const floatingDeps = await homebrew.listFloatingDependencies(config.brewfile);
+  const floatingDeps = await homebrew.listFloatingDependencies(
+    config.value.brewfile
+  );
   if (floatingDeps.isErr()) {
     throw new Error(floatingDeps.error.message);
   }
@@ -91,7 +99,7 @@ const action: (options: ApplyOptions) => Promise<void> = async (options) => {
     }
 
     console.log("\n🗑️ Removing packages...");
-    const cleanup = await homebrew.forceCleanup(config.brewfile);
+    const cleanup = await homebrew.forceCleanup(config.value.brewfile);
     if (cleanup.isErr()) {
       throw new Error(cleanup.error.message);
     }
@@ -102,14 +110,14 @@ const action: (options: ApplyOptions) => Promise<void> = async (options) => {
 
   // Install and upgrade packages.
   console.log("\n📥 Installing and upgrading packages from Brewfile");
-  const install = await homebrew.install(config.brewfile);
+  const install = await homebrew.install(config.value.brewfile);
   if (install.isErr()) {
     throw new Error(install.error.message);
   }
 
   // Final check.
   console.log("\n🔍 Checking all packages in Brewfile are installed");
-  const allInstalled = await homebrew.check(config.brewfile);
+  const allInstalled = await homebrew.check(config.value.brewfile);
   if (allInstalled.isErr()) {
     throw new Error(allInstalled.error.message);
   }

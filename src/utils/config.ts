@@ -5,31 +5,32 @@ import { constants } from "fs";
 import YAML from "yaml";
 import { homedir } from "os";
 import { resolve } from "path";
+import { Result, ok, err } from "neverthrow";
 
-export const getConfig = async (): Promise<Config> => {
+export const getConfig = async (): Promise<Result<Config, Error>> => {
   const path = getConfigPath();
   console.log(`🧩 Using config: ${path}`);
 
   try {
     await access(path, constants.F_OK);
   } catch {
-    throw new Error(`Config not found at ${path}`);
+    return err(new Error(`Config not found at ${path}`));
   }
 
   let config: Config;
   try {
     const file = await readFile(path, "utf8");
     config = YAML.parse(file);
-  } catch (err) {
-    const msg = err instanceof Error ? err.message : String(err);
-    throw new Error(`Unable to parse config at ${path}: ${msg}`);
+  } catch (error) {
+    const msg = error instanceof Error ? error.message : String(error);
+    return err(new Error(`Parsing config at ${path}: ${msg}`));
   }
 
   if (!config.brewfile) {
-    throw new Error("Invalid config format: 'brewfile' is not defined");
+    return err(new Error("Invalid config format: 'brewfile' is not defined"));
   }
   if (!config.machines) {
-    throw new Error("Invalid config format: 'machines' is not defined");
+    return err(new Error("Invalid config format: 'machines' is not defined"));
   }
 
   config.metadata = {
@@ -37,7 +38,7 @@ export const getConfig = async (): Promise<Config> => {
     version: version,
   };
 
-  return config;
+  return ok(config);
 };
 
 export const getConfigPath = (): string => {

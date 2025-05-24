@@ -17,7 +17,14 @@ const action: (options: GenerateOptions) => Promise<void> = async (options) => {
   console.log(`🖥️ Machine: ${options.machine}`);
 
   const config = await getConfig();
-  await generateBrewfile(config, options.machine);
+  if (config.isErr()) {
+    throw new Error(config.error.message);
+  }
+
+  const ok = await generateBrewfile(config.value, options.machine);
+  if (ok.isErr()) {
+    throw new Error(ok.error.message);
+  }
 };
 
 export const generate = {
