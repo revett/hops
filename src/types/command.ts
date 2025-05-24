@@ -1,10 +1,11 @@
+export type CommandOption = {
+  readonly flags: string;
+  readonly description: string;
+};
+
 export type Command<T = Record<string, unknown>> = {
-  name: string;
-  description: string;
-  options?: {
-    flags: string;
-    description: string;
-    default?: string;
-  }[];
-  action: (options: T) => void | Promise<void>;
+  readonly name: string;
+  readonly description: string;
+  readonly options?: readonly CommandOption[];
+  readonly action: (options: T) => void | Promise<void>;
 };
