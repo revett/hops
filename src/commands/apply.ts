@@ -3,6 +3,7 @@ import * as homebrew from "../services/homebrew";
 import type { Command } from "../types/command";
 import { getConfig } from "../utils/config";
 import { createInterface } from "readline";
+import { Result, ok, err } from "neverthrow";
 
 type ApplyOptions = {
   machine?: string;
@@ -31,41 +32,43 @@ const promptUser = async (message: string): Promise<boolean> => {
   });
 };
 
-const action: (options: ApplyOptions) => Promise<void> = async (options) => {
+const action: (options: ApplyOptions) => Promise<Result<void, Error>> = async (
+  options
+) => {
   if (!options.machine) {
-    throw new Error("Machine flag is required");
+    return err(new Error("Machine flag is required"));
   }
   if (options.machine === "shared") {
-    throw new Error("Machine flag not allowed: shared");
+    return err(new Error("Machine flag not allowed: shared"));
   }
 
   console.log(`🖥️ Machine: ${options.machine}`);
 
   const config = await getConfig();
   if (config.isErr()) {
-    throw new Error(config.error.message);
+    return err(config.error);
   }
-  const ok = await generateBrewfile(config.value, options.machine);
-  if (ok.isErr()) {
-    throw new Error(ok.error.message);
+  const generate = await generateBrewfile(config.value, options.machine);
+  if (generate.isErr()) {
+    return err(generate.error);
   }
 
   // List packages.
   const taps = await homebrew.listTaps(config.value.brewfile);
   if (taps.isErr()) {
-    throw new Error(taps.error.message);
+    return err(taps.error);
   }
   displayList(taps.value, "taps");
 
   const formulae = await homebrew.listFormulae(config.value.brewfile);
   if (formulae.isErr()) {
-    throw new Error(formulae.error.message);
+    return err(formulae.error);
   }
   displayList(formulae.value, "formulae");
 
   const casks = await homebrew.listCasks(config.value.brewfile);
   if (casks.isErr()) {
-    throw new Error(casks.error.message);
+    return err(casks.error);
   }
   displayList(casks.value, "casks");
 
@@ -75,7 +78,7 @@ const action: (options: ApplyOptions) => Promise<void> = async (options) => {
     config.value.brewfile
   );
   if (floatingDeps.isErr()) {
-    throw new Error(floatingDeps.error.message);
+    return err(floatingDeps.error);
   }
   if (floatingDeps.value.length > 0) {
     floatingDeps.value.forEach((f) => console.log(`- ${f}`));
@@ -95,7 +98,7 @@ const action: (options: ApplyOptions) => Promise<void> = async (options) => {
     console.log("\n🗑️ Removing packages...");
     const cleanup = await homebrew.forceCleanup(config.value.brewfile);
     if (cleanup.isErr()) {
-      throw new Error(cleanup.error.message);
+      return err(cleanup.error);
     }
     console.log("✅ Cleanup complete");
   } else {
@@ -106,14 +109,14 @@ const action: (options: ApplyOptions) => Promise<void> = async (options) => {
   console.log("\n📥 Installing and upgrading packages from Brewfile");
   const install = await homebrew.install(config.value.brewfile);
   if (install.isErr()) {
-    throw new Error(install.error.message);
+    return err(install.error);
   }
 
   // Final check.
   console.log("\n🔍 Checking all packages in Brewfile are installed");
   const allInstalled = await homebrew.check(config.value.brewfile);
   if (allInstalled.isErr()) {
-    throw new Error(allInstalled.error.message);
+    return err(allInstalled.error);
   }
   if (allInstalled.value) {
     console.log("✅ All packages are installed");
@@ -122,6 +125,8 @@ const action: (options: ApplyOptions) => Promise<void> = async (options) => {
   }
 
   console.log("\n✨ Hops apply completed successfully!");
+
+  return ok(undefined);
 };
 
 export const apply = {

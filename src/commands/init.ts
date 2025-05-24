@@ -5,6 +5,7 @@ import { fileExists } from "../utils/file";
 import { homedir } from "os";
 import { writeFile } from "fs/promises";
 import YAML from "yaml";
+import { Result, ok, err } from "neverthrow";
 
 // Default config with a few example packages to illustrate the structure.
 const defaultConfig: Config = {
@@ -20,11 +21,11 @@ const defaultConfig: Config = {
   },
 };
 
-const action: () => Promise<void> = async () => {
+const action: () => Promise<Result<void, Error>> = async () => {
   const path = getConfigPath();
 
   if (await fileExists(path)) {
-    throw new Error(`Config file already exists at ${path}`);
+    return err(new Error(`Config file already exists at ${path}`));
   }
 
   const yaml = YAML.stringify(defaultConfig);
@@ -32,10 +33,12 @@ const action: () => Promise<void> = async () => {
   try {
     await writeFile(path, yaml, "utf8");
     console.log(`✅ Created hops config at: ${path}`);
-  } catch (err) {
-    const msg = err instanceof Error ? err.message : String(err);
-    throw new Error(`Unable to write to config at ${path}: ${msg}`);
+  } catch (error) {
+    const msg = error instanceof Error ? error.message : String(error);
+    return err(new Error(`Writing to config at ${path}: ${msg}`));
   }
+
+  return ok(undefined);
 };
 
 export const init = {

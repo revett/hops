@@ -1,3 +1,4 @@
+import { Result, ok, err } from "neverthrow";
 import { generateBrewfile } from "../services/brewfile";
 import type { Command } from "../types/command";
 import { getConfig } from "../utils/config";
@@ -6,25 +7,29 @@ type GenerateOptions = {
   machine?: string;
 };
 
-const action: (options: GenerateOptions) => Promise<void> = async (options) => {
+const action: (
+  options: GenerateOptions
+) => Promise<Result<void, Error>> = async (options) => {
   if (!options.machine) {
-    throw new Error("Machine flag is required");
+    return err(new Error("Machine flag is required"));
   }
   if (options.machine === "shared") {
-    throw new Error("Machine flag not allowed: shared");
+    return err(new Error("Machine flag not allowed: shared"));
   }
 
   console.log(`🖥️ Machine: ${options.machine}`);
 
   const config = await getConfig();
   if (config.isErr()) {
-    throw new Error(config.error.message);
+    return err(config.error);
   }
 
-  const ok = await generateBrewfile(config.value, options.machine);
-  if (ok.isErr()) {
-    throw new Error(ok.error.message);
+  const generate = await generateBrewfile(config.value, options.machine);
+  if (generate.isErr()) {
+    return err(generate.error);
   }
+
+  return ok(undefined);
 };
 
 export const generate = {

@@ -6,10 +6,17 @@ const cli = cac("hops");
 
 commands.forEach((cmd) => {
   const command = cli.command(cmd.name, cmd.description);
+
   cmd.options?.forEach((opt) => {
     command.option(opt.flags, opt.description);
   });
-  command.action(cmd.action);
+
+  command.action(async (options) => {
+    const result = await cmd.action(options);
+    if (result.isErr()) {
+      throw result.error;
+    }
+  });
 });
 
 cli.help();
@@ -24,8 +31,8 @@ if (!process.argv.slice(2).length) {
 try {
   cli.parse(process.argv, { run: false });
   await cli.runMatchedCommand();
-} catch (err) {
-  const msg = err instanceof Error ? err.message : String(err);
+} catch (error) {
+  const msg = error instanceof Error ? error.message : String(error);
   console.error(msg);
   process.exit(1);
 }
