@@ -42,13 +42,18 @@ machines:
 
 ```bash
 # Install via GitHub release
-TODO
+curl -L https://github.com/revett/hops/releases/download/vX.Y.Z/hops_X.Y.Z_darwin_arm64.tar.gz -o hops.tar.gz
+tar -xzf hops.tar.gz
+xattr -c ./hops
+sudo mv hops /usr/local/bin
+hops -h
 
 # Build from source (required Bun)
 git clone https://github.com/revett/hops.git
 cd hops
 make build
-./hops -h
+sudo mv hops /usr/local/bin
+hops -h
 ```
 
 ## Usage
@@ -89,14 +94,10 @@ Hops will take care of:
 ```bash
 # Initialize a new hops.yml configuration file with examples.
 hops init
-```
 
-```bash
 # Generate a local Brewfile for a specific machine without installing anything.
 hops generate --machine work
-```
 
-```bash
 # Generate Brewfile and apply changes via Homebrew commands (install, upgrade, cleanup).
 hops apply --machine personal
 ```
@@ -105,3 +106,14 @@ hops apply --machine personal
 
 See [hops.yml](https://github.com/revett/dotfiles/blob/main/hops.yml) in
 [revett/dotfiles](https://github.com/revett/dotfiles).
+
+## Releases
+
+Tag the release locally and push to GitHub, then build the release asset, and finally create the
+release by hand in GitHub.
+
+```bash
+git tag -a vX.Y.Z -m "Release vX.Y.Z"
+git push origin vX.Y.Z
+make release VERSION=vX.Y.Z
+```
