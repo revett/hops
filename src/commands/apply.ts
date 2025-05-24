@@ -8,6 +8,15 @@ type ApplyOptions = {
   machine?: string;
 };
 
+const displayList = (items: string[], label: string): void => {
+  console.log(`\n📦 Listing ${label} in Brewfile`);
+  if (items.length > 0) {
+    items.forEach((item) => console.log(`- ${item}`));
+  } else {
+    console.log("- None.");
+  }
+};
+
 const promptUser = async (message: string): Promise<boolean> => {
   const rl = createInterface({
     input: process.stdin,
@@ -42,38 +51,23 @@ const action: (options: ApplyOptions) => Promise<void> = async (options) => {
   }
 
   // List packages.
-  console.log("\n📦 Listing taps in Brewfile");
   const taps = await homebrew.listTaps(config.value.brewfile);
   if (taps.isErr()) {
     throw new Error(taps.error.message);
   }
-  if (taps.value.length > 0) {
-    taps.value.forEach((t) => console.log(`- ${t}`));
-  } else {
-    console.log("- None.");
-  }
+  displayList(taps.value, "taps");
 
-  console.log("\n📦 Listing formulae in Brewfile");
   const formulae = await homebrew.listFormulae(config.value.brewfile);
   if (formulae.isErr()) {
     throw new Error(formulae.error.message);
   }
-  if (formulae.value.length > 0) {
-    formulae.value.forEach((b) => console.log(`- ${b}`));
-  } else {
-    console.log("- None.");
-  }
+  displayList(formulae.value, "formulae");
 
-  console.log("\n📦 Listing casks in Brewfile");
   const casks = await homebrew.listCasks(config.value.brewfile);
   if (casks.isErr()) {
     throw new Error(casks.error.message);
   }
-  if (casks.value.length > 0) {
-    casks.value.forEach((c) => console.log(`- ${c}`));
-  } else {
-    console.log("- None.");
-  }
+  displayList(casks.value, "casks");
 
   // Cleanup packages not in Brewfile.
   console.log("\n🧹 Checking for packages not in Brewfile");
