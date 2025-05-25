@@ -14,19 +14,19 @@ function createEnv(brewfilePath: string): Record<string, string> {
   return env;
 }
 
-export async function listCasks(
+export async function listTaps(
   brewfilePath: string
 ): Promise<Result<string[], Error>> {
   try {
-    const result = await $`brew bundle list --casks`
+    const result = await $`brew bundle list --taps`
       .env(createEnv(brewfilePath))
       .quiet();
-    const casks = result.text().trim().split("\n").filter(Boolean);
-    return ok(casks);
+    const taps = result.text().trim().split("\n").filter(Boolean);
+    return ok(taps);
   } catch (error) {
     return err(
       new Error(
-        `Listing casks: ${
+        `Listing taps: ${
           error instanceof Error ? error.message : String(error)
         }`
       )
@@ -54,19 +54,19 @@ export async function listFormulae(
   }
 }
 
-export async function listTaps(
+export async function listCasks(
   brewfilePath: string
 ): Promise<Result<string[], Error>> {
   try {
-    const result = await $`brew bundle list --taps`
+    const result = await $`brew bundle list --casks`
       .env(createEnv(brewfilePath))
       .quiet();
-    const taps = result.text().trim().split("\n").filter(Boolean);
-    return ok(taps);
+    const casks = result.text().trim().split("\n").filter(Boolean);
+    return ok(casks);
   } catch (error) {
     return err(
       new Error(
-        `Listing taps: ${
+        `Listing casks: ${
           error instanceof Error ? error.message : String(error)
         }`
       )

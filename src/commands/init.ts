@@ -17,7 +17,10 @@ const defaultConfig: Config = {
       casks: ["1password", "raycast", "spotify"],
     },
     personal: { casks: ["adobe-creative-cloud"] },
-    work: { casks: ["loom", "slack"] },
+    work: {
+      casks: ["cursor", "loom", "slack"],
+      cursor: ["dbaeumer.vscode-eslint", "github.github-vscode-theme"],
+    },
   },
 };
 
