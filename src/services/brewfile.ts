@@ -3,6 +3,23 @@ import { writeFile } from "fs/promises";
 import dayjs from "dayjs";
 import { Result, ok, err } from "neverthrow";
 
+const displayItems = (
+  lines: string[],
+  items: Set<string>,
+  title: string,
+  prefix: string
+) => {
+  lines.push(`\n# ${title}\n`);
+
+  if (items.size > 0) {
+    [...items].sort().forEach((i) => lines.push(`${prefix} "${i}"`));
+  } else {
+    lines.push("# None.");
+  }
+
+  return lines;
+};
+
 export async function generateBrewfile(
   config: Config,
   machine: string
@@ -20,15 +37,26 @@ export async function generateBrewfile(
   const taps = new Set<string>();
   const formulae = new Set<string>();
   const casks = new Set<string>();
+  const cursor = new Set<string>();
 
   for (const [mach, packages] of Object.entries(machines)) {
     if (mach !== machine && mach !== "shared") {
       continue;
     }
 
-    packages.taps?.forEach((tap) => taps.add(tap));
+    packages.taps?.forEach((t) => taps.add(t));
     packages.formulae?.forEach((f) => formulae.add(f));
-    packages.casks?.forEach((cask) => casks.add(cask));
+    packages.casks?.forEach((c) => casks.add(c));
+    packages.cursor?.forEach((c) => cursor.add(c));
+  }
+
+  const hasCursorInstalled = casks.has("cursor");
+  if (!hasCursorInstalled && cursor.size > 0) {
+    return err(
+      new Error(
+        "Cursor extensions defined in hops.yml but Cursor cask not installed"
+      )
+    );
   }
 
   const lines: string[] = [];
@@ -38,32 +66,15 @@ export async function generateBrewfile(
   );
   lines.push(`# Config: ${metadata.path}`);
   lines.push(`# Machine: ${machine}`);
-  lines.push(`# Last updated: ${dayjs().format("YYYY-MM-DD HH:mm:ss")}\n`);
+  lines.push(`# Last updated: ${dayjs().format("YYYY-MM-DD HH:mm:ss")}`);
 
-  lines.push("# Taps\n");
-  if (taps.size > 0) {
-    [...taps].sort().forEach((tap) => lines.push(`tap "${tap}"`));
-  } else {
-    lines.push("# None.");
-  }
-
-  lines.push("\n# Formulae\n");
-  if (formulae.size > 0) {
-    [...formulae].sort().forEach((f) => lines.push(`brew "${f}"`));
-  } else {
-    lines.push("# None.");
-  }
-
-  lines.push("\n# Casks\n");
-
-  if (casks.size > 0) {
-    [...casks].sort().forEach((cask) => lines.push(`cask "${cask}"`));
-  } else {
-    lines.push("# None.");
-  }
+  displayItems(lines, taps, "Taps", "tap");
+  displayItems(lines, formulae, "Formulae", "brew");
+  displayItems(lines, casks, "Casks", "cask");
+  displayItems(lines, cursor, "Cursor", "vscode");
 
   console.log(
-    `🧪 Writing ${taps.size} taps, ${formulae.size} formulae, ${casks.size} casks`
+    `🧪 Writing ${taps.size} taps, ${formulae.size} formulae, ${casks.size} casks, ${cursor.size} cursor extensions`
   );
   console.log(`📄 Writing Brewfile: ${brewfile}`);
 

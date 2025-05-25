@@ -6,6 +6,9 @@
   "author": "revett <2796074+revett@users.noreply.github.com>",
   "license": "MIT",
   "private": true,
+  "scripts": {
+    "lint": "bun run tsc --noEmit --strict"
+  },
   "dependencies": {
     "cac": "^6.7.14",
     "dayjs": "^1.11.13",

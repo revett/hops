@@ -34,8 +34,12 @@ machines:
       - adobe-creative-cloud
   work:
     casks:
+      - cursor
       - loom
       - slack
+    cursor:
+      - dbaeumer.vscode-eslint
+      - github.github-vscode-theme
 ```
 
 ## Install
@@ -107,7 +111,17 @@ hops apply --machine personal
 See [hops.yml](https://github.com/revett/dotfiles/blob/main/hops.yml) in
 [revett/dotfiles](https://github.com/revett/dotfiles).
 
-## Releases
+## FAQ
+
+**Does it support Cursor extensions?**
+
+Yes, as part of the [v4.5.0](https://brew.sh/2025/04/29/homebrew-4.5.0/) release of Homebrew on 29th
+April 2025, the `brew bundle` command looks for VS Code variants, see
+[#19545](https://github.com/Homebrew/brew/pull/19545).
+
+## Project
+
+### Releases
 
 1. Bump version in `package.json` and push
 1. `git tag -a vX.Y.Z -m "Release vX.Y.Z"`
