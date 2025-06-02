@@ -1,3 +1,3 @@
 export type Package = {
-	version: string;
+  version: string;
 };
