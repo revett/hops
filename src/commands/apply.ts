@@ -1,4 +1,5 @@
 import { generateBrewfile } from "../services/brewfile";
+import { cancel, confirm, intro, isCancel, log, outro} from '@clack/prompts';
 import * as homebrew from "../services/homebrew";
 import type { Command } from "../types/command";
 import { getConfig } from "../utils/config";
@@ -12,6 +13,8 @@ type ApplyOptions = {
 const action: (options: ApplyOptions) => Promise<Result<void, Error>> = async (
   options
 ) => {
+  intro('hops');
+
   if (!options.machine) {
     return err(new Error("Machine flag is required"));
   }
@@ -50,7 +53,7 @@ const action: (options: ApplyOptions) => Promise<Result<void, Error>> = async (
   }
 
   // Cleanup packages not in Brewfile
-  console.log("\n🧹 Installed packages not in Brewfile");
+  console.log("\n🧹 Checking for packages not in Brewfile");
   const floating = await homebrew.listFloatingPackages(
     config.value.brewfile,
     "-"
@@ -59,19 +62,15 @@ const action: (options: ApplyOptions) => Promise<Result<void, Error>> = async (
     return err(floating.error);
   }
   if (!floating.value) {
-    // TODO: Replace with prompt library, as was interfering with stdin of execa
-    // TODO: Move to either prompts or @inquirer/prompts or @clack/prompts
-    // console.log(
-    //   "\n🚧 STOP! Do any of the above packages need to be added to the Brewfile?"
-    // );
-    // const proceed = await promptUser(
-    //   "Press ENTER to proceed with cleanup, any other key to exit: "
-    // );
+    log.info('Check if any of the above packages need to be added to your hops.yml')
+    const shouldContinue = await confirm({
+      message: 'Uninstall these packages?',
+    });
 
-    // if (!proceed) {
-    //   console.log("❌ Exiting without cleanup.");
-    //   process.exit(0);
-    // }
+    if (isCancel(shouldContinue) || !shouldContinue) {
+      log.error('Exiting early, no packages uninstalled');
+      process.exit(0);
+    }
 
     console.log("\n🗑️ Removing packages");
     const cleanup = await homebrew.forceCleanup(config.value.brewfile);
