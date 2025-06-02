@@ -6,8 +6,6 @@
 
 Manage [Homebrew](https://brew.sh) packages across multiple machines with a single YAML file.
 
-## Demo
-
 ![hops-v0 3 1-demo](https://github.com/user-attachments/assets/253624a3-270a-4f17-b92f-825593b426f7)
 
 ## Why?
