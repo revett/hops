@@ -1,178 +1,199 @@
-import { $ } from "bun";
+import { execa } from "execa";
 import { Result, ok, err } from "neverthrow";
 
-function createEnv(brewfilePath: string): Record<string, string> {
-  const env: Record<string, string> = {};
-
-  for (const [key, value] of Object.entries(process.env)) {
-    if (value !== undefined) {
-      env[key] = value;
-    }
+export function createEnv(brewfilePath: string): Record<string, string> {
+  return {
+    HOMEBREW_BUNDLE_FILE: brewfilePath,
   }
-  env["HOMEBREW_BUNDLE_FILE"] = brewfilePath;
-
-  return env;
 }
 
 export async function listTaps(
-  brewfilePath: string
-): Promise<Result<string[], Error>> {
-  try {
-    const result = await $`brew bundle list --taps`
-      .env(createEnv(brewfilePath))
-      .quiet();
-    const taps = result.text().trim().split("\n").filter(Boolean);
-    return ok(taps);
-  } catch (error) {
+  brewfilePath: string,
+  prefix: string
+): Promise<Result<void, Error>> {
+  const result = await execa({
+    env: createEnv(brewfilePath),
+    lines: true,
+    reject: false,
+    stdin: "inherit",
+  })`brew bundle list --taps`;
+
+  if (result.exitCode !== 0) {
+    console.log(result.message);
     return err(
       new Error(
-        `Listing taps: ${
-          error instanceof Error ? error.message : String(error)
-        }`
+        `Homebrew command failed with exit code ${result.exitCode}: brew bundle list --taps`
       )
     );
   }
+
+  const lines = result.stdout.filter(Boolean);
+  for (const l of lines) {
+    console.log(`${prefix} ${l}`);
+  }
+
+  return ok(undefined);
 }
 
 export async function listFormulae(
-  brewfilePath: string
-): Promise<Result<string[], Error>> {
-  try {
-    const result = await $`brew bundle list --brews`
-      .env(createEnv(brewfilePath))
-      .quiet();
-    const formulae = result.text().trim().split("\n").filter(Boolean);
-    return ok(formulae);
-  } catch (error) {
+  brewfilePath: string,
+  prefix: string
+): Promise<Result<void, Error>> {
+  const result = await execa({
+    env: createEnv(brewfilePath),
+    lines: true,
+    reject: false,
+    stdin: "inherit",
+  })`brew bundle list --brews`;
+
+  if (result.exitCode !== 0) {
+    console.log(result.message);
     return err(
       new Error(
-        `Listing formulae: ${
-          error instanceof Error ? error.message : String(error)
-        }`
+        `Homebrew command failed with exit code ${result.exitCode}: brew bundle list --brews`
       )
     );
   }
+
+  const lines = result.stdout.filter(Boolean);
+  for (const l of lines) {
+    console.log(`${prefix} ${l}`);
+  }
+
+  return ok(undefined);
 }
 
 export async function listCasks(
-  brewfilePath: string
-): Promise<Result<string[], Error>> {
-  try {
-    const result = await $`brew bundle list --casks`
-      .env(createEnv(brewfilePath))
-      .quiet();
-    const casks = result.text().trim().split("\n").filter(Boolean);
-    return ok(casks);
-  } catch (error) {
+  brewfilePath: string,
+  prefix: string
+): Promise<Result<void, Error>> {
+  const result = await execa({
+    env: createEnv(brewfilePath),
+    lines: true,
+    reject: false,
+    stdin: "inherit",
+  })`brew bundle list --casks`;
+
+  if (result.exitCode !== 0) {
+    console.log(result.message);
     return err(
       new Error(
-        `Listing casks: ${
-          error instanceof Error ? error.message : String(error)
-        }`
+        `Homebrew command failed with exit code ${result.exitCode}: brew bundle list --casks`
       )
     );
   }
+
+  const lines = result.stdout.filter(Boolean);
+  for (const l of lines) {
+    console.log(`${prefix} ${l}`);
+  }
+
+  return ok(undefined);
 }
 
-export async function listFloatingDependencies(
-  brewfilePath: string
-): Promise<Result<string[], Error>> {
-  try {
-    const result = await $`brew bundle cleanup`
-      .env(createEnv(brewfilePath))
-      .quiet()
-      .nothrow(); // Needed as if packages to uninstall, then non-zero exit code returned.
+export async function listFloatingPackages(
+  brewfilePath: string,
+  prefix: string
+): Promise<Result<boolean, Error>> { // Returns (ok, err) where ok is true if no packages to remove
+  const result = await execa({
+    env: createEnv(brewfilePath),
+    lines: true,
+    reject: false,
+    stdin: "inherit",
+  })`brew bundle cleanup`;
 
-    const output = result.text().trim();
+  // List of known log lines that we want to filter out, as not relevant
+  const blockListLinePrefixes = [
+    "Would uninstall ",
+    "Would `brew cleanup`:",
+    "Run `brew bundle cleanup",
+  ]
 
-    // If empty output or explicitly says nothing to uninstall, return empty array
-    if (!output || output === "") {
-      return ok([]);
+  const lines = result.stdout.filter(line => {
+    return !blockListLinePrefixes.some(prefix => line.startsWith(prefix));
+  });
+
+  // Remove "Would remove: " prefix from lines that start with it
+  const processedLines = lines.map(line => {
+    if (line.startsWith("Would remove: ")) {
+      return line.substring("Would remove: ".length);
+    }
+    return line;
+  });
+
+  if (processedLines.length > 0) {
+    for (const l of processedLines) {
+      console.log(`${prefix} ${l}`);
     }
 
-    const packages: string[] = [];
-    const lines = output.split("\n");
-
-    let isPackageSection = false;
-    for (const line of lines) {
-      // Check if we're entering a package listing section.
-      if (line.startsWith("Would uninstall")) {
-        isPackageSection = true;
-        continue;
-      }
-
-      // Check if we've hit the end of package listings.
-      if (line.startsWith("Run `brew bundle cleanup")) {
-        break;
-      }
-
-      // If we're in a package section, parse the packages, splitting by whitespace to handle
-      // multiple packages per line.
-      if (isPackageSection && line.trim()) {
-        const items = line.trim().split(/\s+/);
-        packages.push(...items);
-      }
-    }
-
-    return ok(packages);
-  } catch (error) {
-    return err(
-      new Error(
-        `Listing floating dependencies: ${
-          error instanceof Error ? error.message : String(error)
-        }`
-      )
-    );
+    return ok(false);
   }
+
+  return ok(true);
 }
 
 export async function forceCleanup(
   brewfilePath: string
 ): Promise<Result<void, Error>> {
-  try {
-    await $`brew bundle --force cleanup`.env(createEnv(brewfilePath));
-    return ok(undefined);
-  } catch (error) {
+  const result = await execa({
+    env: createEnv(brewfilePath),
+    reject: false,
+    stdin: "inherit",
+    stdout: "inherit",
+  })`brew bundle --force cleanup`;
+
+  if (result.exitCode !== 0) {
+    console.log(result.message);
     return err(
       new Error(
-        `Removing floating dependencies: ${
-          error instanceof Error ? error.message : String(error)
-        }`
+        `Homebrew command failed with exit code ${result.exitCode}: brew bundle --force cleanup`
       )
     );
   }
+
+  return ok(undefined);
 }
 
 export async function install(
   brewfilePath: string
 ): Promise<Result<void, Error>> {
-  try {
-    await $`brew bundle install`.env(createEnv(brewfilePath));
-    return ok(undefined);
-  } catch (error) {
+  const result = await execa({
+    env: createEnv(brewfilePath),
+    reject: false,
+    stdin: "inherit",
+    stdout: "inherit",
+  })`brew bundle install`;
+
+  if (result.exitCode !== 0) {
+    console.log(result.message);
     return err(
       new Error(
-        `Installing/updating packages: ${
-          error instanceof Error ? error.message : String(error)
-        }`
+        `Homebrew command failed with exit code ${result.exitCode}: brew bundle install`
       )
     );
   }
+
+  return ok(undefined);
 }
 
 export async function check(
   brewfilePath: string
-): Promise<Result<boolean, Error>> {
-  try {
-    await $`brew bundle check`.env(createEnv(brewfilePath)).quiet();
-    return ok(true);
-  } catch (error) {
+): Promise<Result<void, Error>> {
+  const result = await execa({
+    env: createEnv(brewfilePath),
+    reject: false,
+    stdin: "inherit",
+    stdout: "inherit",
+  })`brew bundle check`;
+
+  if (result.exitCode !== 0) {
+    console.log(result.message);
     return err(
       new Error(
-        `Checking packages: ${
-          error instanceof Error ? error.message : String(error)
-        }`
+        `Homebrew command failed with exit code ${result.exitCode}: brew bundle check`
       )
     );
   }
+
+  return ok(undefined);
 }

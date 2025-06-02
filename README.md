@@ -128,3 +128,13 @@ April 2025, the `brew bundle` command looks for VS Code variants, see
 1. `git push origin vX.Y.Z`
 1. `make release VERSION=vX.Y.Z`
 1. Create release in GitHub
+
+### Local Development
+
+```bash
+# Build local binary
+make build
+
+# Debug local binary
+./hops -h
+```

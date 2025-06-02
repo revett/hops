@@ -2,35 +2,12 @@ import { generateBrewfile } from "../services/brewfile";
 import * as homebrew from "../services/homebrew";
 import type { Command } from "../types/command";
 import { getConfig } from "../utils/config";
-import { createInterface } from "readline";
 import { Result, ok, err } from "neverthrow";
 
 type ApplyOptions = {
   machine?: string;
 };
 
-const displayList = (items: string[], label: string): void => {
-  console.log(`\n📦 Listing ${label} in Brewfile`);
-  if (items.length > 0) {
-    items.forEach((item) => console.log(`- ${item}`));
-  } else {
-    console.log("- None.");
-  }
-};
-
-const promptUser = async (message: string): Promise<boolean> => {
-  const rl = createInterface({
-    input: process.stdin,
-    output: process.stdout,
-  });
-
-  return new Promise((resolve) => {
-    rl.question(message, (answer) => {
-      rl.close();
-      resolve(answer === "");
-    });
-  });
-};
 
 const action: (options: ApplyOptions) => Promise<Result<void, Error>> = async (
   options
@@ -53,75 +30,72 @@ const action: (options: ApplyOptions) => Promise<Result<void, Error>> = async (
     return err(generate.error);
   }
 
-  // List packages.
-  const taps = await homebrew.listTaps(config.value.brewfile);
+  // List everything that is currently installed
+  console.log(`\n📦 Installed taps`);
+  const taps = await homebrew.listTaps(config.value.brewfile, "-");
   if (taps.isErr()) {
     return err(taps.error);
   }
-  displayList(taps.value, "taps");
 
-  const formulae = await homebrew.listFormulae(config.value.brewfile);
+  console.log(`\n📦 Installed formulae`);
+  const formulae = await homebrew.listFormulae(config.value.brewfile, "-");
   if (formulae.isErr()) {
     return err(formulae.error);
   }
-  displayList(formulae.value, "formulae");
 
-  const casks = await homebrew.listCasks(config.value.brewfile);
+  console.log(`\n📦 Installed casks`);
+  const casks = await homebrew.listCasks(config.value.brewfile, "-");
   if (casks.isErr()) {
     return err(casks.error);
   }
-  displayList(casks.value, "casks");
 
-  // Cleanup packages not in Brewfile.
-  console.log("\n🧹 Checking for packages not in Brewfile");
-  const floatingDeps = await homebrew.listFloatingDependencies(
-    config.value.brewfile
+  // Cleanup packages not in Brewfile
+  console.log("\n🧹 Installed packages not in Brewfile");
+  const floating = await homebrew.listFloatingPackages(
+    config.value.brewfile,
+    "-"
   );
-  if (floatingDeps.isErr()) {
-    return err(floatingDeps.error);
+  if (floating.isErr()) {
+    return err(floating.error);
   }
-  if (floatingDeps.value.length > 0) {
-    floatingDeps.value.forEach((f) => console.log(`- ${f}`));
+  if (!floating.value) {
+    // TODO: Replace with prompt library, as was interfering with stdin of execa
+    // TODO: Move to either prompts or @inquirer/prompts or @clack/prompts
+    // console.log(
+    //   "\n🚧 STOP! Do any of the above packages need to be added to the Brewfile?"
+    // );
+    // const proceed = await promptUser(
+    //   "Press ENTER to proceed with cleanup, any other key to exit: "
+    // );
 
-    console.log(
-      "\n🚧 STOP! Do any of the above packages need to be added to the Brewfile?"
-    );
-    const proceed = await promptUser(
-      "Press ENTER to proceed with cleanup, any other key to exit: "
-    );
+    // if (!proceed) {
+    //   console.log("❌ Exiting without cleanup.");
+    //   process.exit(0);
+    // }
 
-    if (!proceed) {
-      console.log("❌ Exiting without cleanup.");
-      process.exit(0);
-    }
-
-    console.log("\n🗑️ Removing packages...");
+    console.log("\n🗑️ Removing packages");
     const cleanup = await homebrew.forceCleanup(config.value.brewfile);
     if (cleanup.isErr()) {
       return err(cleanup.error);
     }
+
     console.log("✅ Cleanup complete");
   } else {
     console.log("✅ No packages to remove");
   }
 
-  // Install and upgrade packages.
+  // Install and upgrade packages
   console.log("\n📥 Installing and upgrading packages from Brewfile");
   const install = await homebrew.install(config.value.brewfile);
   if (install.isErr()) {
     return err(install.error);
   }
 
-  // Final check.
+  // Final check
   console.log("\n🔍 Checking all packages in Brewfile are installed");
   const allInstalled = await homebrew.check(config.value.brewfile);
   if (allInstalled.isErr()) {
     return err(allInstalled.error);
-  }
-  if (allInstalled.value) {
-    console.log("✅ All packages are installed");
-  } else {
-    console.warn("⚠️ Some packages may not be installed correctly");
   }
 
   console.log("\n✨ Hops apply completed successfully!");

@@ -7,7 +7,7 @@ import { writeFile } from "fs/promises";
 import YAML from "yaml";
 import { Result, ok, err } from "neverthrow";
 
-// Default config with a few example packages to illustrate the structure.
+// Default config with a few example packages to illustrate the structure
 const defaultConfig: Config = {
   brewfile: `${homedir()}/Brewfile`,
   machines: {
