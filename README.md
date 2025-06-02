@@ -123,7 +123,7 @@ April 2025, the `brew bundle` command looks for VS Code variants, see
 
 ### Releases
 
-1. Bump version in `package.json` and push
+1. Bump version in `package.json` and push as `Bump version to X.Y.Z` commit
 1. `git tag -a vX.Y.Z -m "Release vX.Y.Z"`
 1. `git push origin vX.Y.Z`
 1. `make release VERSION=vX.Y.Z`
