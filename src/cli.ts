@@ -30,7 +30,6 @@ if (!process.argv.slice(2).length) {
 }
 
 // Find and run the command
-// TODO: Replace all instances of `try {}` with .then().catch()
 try {
   intro(pc.bgGreen(pc.bold('hops')));
   cli.parse(process.argv, { run: false });
