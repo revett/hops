@@ -6,6 +6,8 @@ import { homedir } from "os";
 import { writeFile } from "fs/promises";
 import YAML from "yaml";
 import { Result, ok, err } from "neverthrow";
+import pc from "picocolors";
+import { log } from "@clack/prompts";
 
 // Default config with a few example packages to illustrate the structure
 const defaultConfig: Config = {
@@ -25,20 +27,22 @@ const defaultConfig: Config = {
 };
 
 const action: () => Promise<Result<void, Error>> = async () => {
+  log.step(pc.bold('Initializing new hops.yml config'));
+
   const path = getConfigPath();
 
   if (await fileExists(path)) {
-    return err(new Error(`Config file already exists at ${path}`));
+    return err(new Error(`Config file already exists: ${path}`));
   }
 
   const yaml = YAML.stringify(defaultConfig);
 
   try {
     await writeFile(path, yaml, "utf8");
-    console.log(`✅ Created hops config at: ${path}`);
+    log.success(`Created config: ${path}`);
   } catch (error) {
     const msg = error instanceof Error ? error.message : String(error);
-    return err(new Error(`Writing to config at ${path}: ${msg}`));
+    return err(new Error(`Writing to config: ${path}: ${msg}`));
   }
 
   return ok(undefined);

@@ -2,6 +2,8 @@ import { Result, ok, err } from "neverthrow";
 import { generateBrewfile } from "../services/brewfile";
 import type { Command } from "../types/command";
 import { getConfig } from "../utils/config";
+import pc from "picocolors"
+import { log } from "@clack/prompts";
 
 type GenerateOptions = {
   machine?: string;
@@ -10,6 +12,8 @@ type GenerateOptions = {
 const action: (
   options: GenerateOptions
 ) => Promise<Result<void, Error>> = async (options) => {
+  log.step(pc.bold('Reading hops.yml'));
+
   if (!options.machine) {
     return err(new Error("Machine flag is required"));
   }
@@ -17,14 +21,19 @@ const action: (
     return err(new Error("Machine flag not allowed: shared"));
   }
 
-  console.log(`🖥️ Machine: ${options.machine}`);
-
-  const config = await getConfig();
-  if (config.isErr()) {
-    return err(config.error);
+  const configResult = await getConfig();
+  if (configResult.isErr()) {
+    return err(configResult.error);
   }
+  const { config, version, path } = configResult.value;
 
-  const generate = await generateBrewfile(config.value, options.machine);
+  log.info([
+    `Version: v${version}`,
+    `Config: ${path}`,
+    `Machine: ${options.machine}`,
+  ].join('\n'));
+
+  const generate = await generateBrewfile(config, options.machine, version, path);
   if (generate.isErr()) {
     return err(generate.error);
   }
