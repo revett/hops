@@ -1,0 +1,17 @@
+name: Biome / Checks
+
+on: [push]
+
+jobs:
+  check:
+    name: Run
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setup Biome
+        uses: biomejs/setup-biome@v2
+        with:
+          version: latest
+      - name: Run Biome
+        run: bunx biome ci .
