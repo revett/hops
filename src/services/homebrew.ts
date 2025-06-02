@@ -1,3 +1,4 @@
+import { log } from "@clack/prompts";
 import { execa } from "execa";
 import { Result, ok, err } from "neverthrow";
 
@@ -28,9 +29,7 @@ export async function listTaps(
   }
 
   const lines = result.stdout.filter(Boolean);
-  for (const l of lines) {
-    console.log(`${prefix} ${l}`);
-  }
+  log.info(lines.map(l => `${prefix} ${l}`).join('\n'));
 
   return ok(undefined);
 }
@@ -56,9 +55,7 @@ export async function listFormulae(
   }
 
   const lines = result.stdout.filter(Boolean);
-  for (const l of lines) {
-    console.log(`${prefix} ${l}`);
-  }
+  log.info(lines.map(l => `${prefix} ${l}`).join('\n'));
 
   return ok(undefined);
 }
@@ -84,9 +81,7 @@ export async function listCasks(
   }
 
   const lines = result.stdout.filter(Boolean);
-  for (const l of lines) {
-    console.log(`${prefix} ${l}`);
-  }
+  log.info(lines.map(l => `${prefix} ${l}`).join('\n'));
 
   return ok(undefined);
 }
@@ -109,23 +104,20 @@ export async function listFloatingPackages(
     "Run `brew bundle cleanup",
   ]
 
-  const lines = result.stdout.filter(line => {
-    return !blockListLinePrefixes.some(prefix => line.startsWith(prefix));
+  const lines = result.stdout.filter(l => {
+    return !blockListLinePrefixes.some(prefix => l.startsWith(prefix));
   });
 
   // Remove "Would remove: " prefix from lines that start with it
-  const processedLines = lines.map(line => {
-    if (line.startsWith("Would remove: ")) {
-      return line.substring("Would remove: ".length);
+  const processedLines = lines.map(l => {
+    if (l.startsWith("Would remove: ")) {
+      return l.substring("Would remove: ".length);
     }
-    return line;
+    return l;
   });
 
   if (processedLines.length > 0) {
-    for (const l of processedLines) {
-      console.log(`${prefix} ${l}`);
-    }
-
+    log.info(processedLines.map(l => `${prefix} ${l}`).join('\n'));
     return ok(false);
   }
 
@@ -181,9 +173,9 @@ export async function check(
 ): Promise<Result<void, Error>> {
   const result = await execa({
     env: createEnv(brewfilePath),
+    lines: true,
     reject: false,
     stdin: "inherit",
-    stdout: "inherit",
   })`brew bundle check`;
 
   if (result.exitCode !== 0) {
@@ -194,6 +186,15 @@ export async function check(
       )
     );
   }
+
+  const lines = result.stdout.filter(Boolean);
+
+  if (lines.length === 1 && lines[0]?.endsWith('.')) {
+    log.info(lines[0].substring(0, lines[0].length - 1));
+    return ok(undefined);
+  }
+
+  log.info(lines.join('\n'));
 
   return ok(undefined);
 }

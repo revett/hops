@@ -1,19 +1,19 @@
 import { generateBrewfile } from "../services/brewfile";
-import { cancel, confirm, intro, isCancel, log, outro} from '@clack/prompts';
+import { confirm, isCancel, log } from '@clack/prompts';
 import * as homebrew from "../services/homebrew";
 import type { Command } from "../types/command";
 import { getConfig } from "../utils/config";
 import { Result, ok, err } from "neverthrow";
+import pc from "picocolors"
 
 type ApplyOptions = {
   machine?: string;
 };
 
-
 const action: (options: ApplyOptions) => Promise<Result<void, Error>> = async (
   options
 ) => {
-  intro('hops');
+  log.step(pc.bold('Reading hops.yml'));
 
   if (!options.machine) {
     return err(new Error("Machine flag is required"));
@@ -22,40 +22,46 @@ const action: (options: ApplyOptions) => Promise<Result<void, Error>> = async (
     return err(new Error("Machine flag not allowed: shared"));
   }
 
-  console.log(`🖥️ Machine: ${options.machine}`);
-
-  const config = await getConfig();
-  if (config.isErr()) {
-    return err(config.error);
+  const configResult = await getConfig();
+  if (configResult.isErr()) {
+    return err(configResult.error);
   }
-  const generate = await generateBrewfile(config.value, options.machine);
+  const { config, version, path } = configResult.value;
+
+  log.info([
+    `Version: v${version}`,
+    `Config: ${path}`,
+    `Machine: ${options.machine}`,
+  ].join('\n'));
+
+  const generate = await generateBrewfile(config, options.machine, version, path);
   if (generate.isErr()) {
     return err(generate.error);
   }
 
   // List everything that is currently installed
-  console.log(`\n📦 Installed taps`);
-  const taps = await homebrew.listTaps(config.value.brewfile, "-");
+  log.step(pc.bold('Installed taps'));
+  const taps = await homebrew.listTaps(config.brewfile, "-");
   if (taps.isErr()) {
     return err(taps.error);
   }
 
-  console.log(`\n📦 Installed formulae`);
-  const formulae = await homebrew.listFormulae(config.value.brewfile, "-");
+  log.step(pc.bold('Installed formulae'));
+  const formulae = await homebrew.listFormulae(config.brewfile, "-");
   if (formulae.isErr()) {
     return err(formulae.error);
   }
 
-  console.log(`\n📦 Installed casks`);
-  const casks = await homebrew.listCasks(config.value.brewfile, "-");
+  log.step(pc.bold('Installed casks'));
+  const casks = await homebrew.listCasks(config.brewfile, "-");
   if (casks.isErr()) {
     return err(casks.error);
   }
 
   // Cleanup packages not in Brewfile
-  console.log("\n🧹 Checking for packages not in Brewfile");
+  log.step(pc.bold('Checking for packages not in Brewfile'));
   const floating = await homebrew.listFloatingPackages(
-    config.value.brewfile,
+    config.brewfile,
     "-"
   );
   if (floating.isErr()) {
@@ -72,32 +78,30 @@ const action: (options: ApplyOptions) => Promise<Result<void, Error>> = async (
       process.exit(0);
     }
 
-    console.log("\n🗑️ Removing packages");
-    const cleanup = await homebrew.forceCleanup(config.value.brewfile);
+    log.step(pc.bold('Removing packages'));
+    const cleanup = await homebrew.forceCleanup(config.brewfile);
     if (cleanup.isErr()) {
       return err(cleanup.error);
     }
 
-    console.log("✅ Cleanup complete");
+    log.success('Cleanup complete');
   } else {
-    console.log("✅ No packages to remove");
+    log.success('No packages to uninstall');
   }
 
   // Install and upgrade packages
-  console.log("\n📥 Installing and upgrading packages from Brewfile");
-  const install = await homebrew.install(config.value.brewfile);
+  log.step(pc.bold('Install/upgrade packages from Brewfile'));
+  const install = await homebrew.install(config.brewfile);
   if (install.isErr()) {
     return err(install.error);
   }
 
   // Final check
-  console.log("\n🔍 Checking all packages in Brewfile are installed");
-  const allInstalled = await homebrew.check(config.value.brewfile);
+  log.step(pc.bold('Checking all packages in Brewfile are installed'));
+  const allInstalled = await homebrew.check(config.brewfile);
   if (allInstalled.isErr()) {
     return err(allInstalled.error);
   }
-
-  console.log("\n✨ Hops apply completed successfully!");
 
   return ok(undefined);
 };

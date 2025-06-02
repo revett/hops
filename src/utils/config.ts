@@ -6,10 +6,16 @@ import YAML from "yaml";
 import { homedir } from "os";
 import { resolve } from "path";
 import { Result, ok, err } from "neverthrow";
+import { log } from "@clack/prompts";
 
-export const getConfig = async (): Promise<Result<Config, Error>> => {
+type ConfigResult = {
+  config: Config;
+  path: string;
+  version: string;
+}
+
+export const getConfig = async (): Promise<Result<ConfigResult, Error>> => {
   const path = getConfigPath();
-  console.log(`🧩 Using config: ${path}`);
 
   try {
     await access(path, constants.F_OK);
@@ -33,21 +39,20 @@ export const getConfig = async (): Promise<Result<Config, Error>> => {
     return err(new Error("Invalid config format: 'machines' is not defined"));
   }
 
-  config.metadata = {
+  const result: ConfigResult = {
+    config: config,
     path: path,
     version: version,
   };
 
-  return ok(config);
+  return ok(result);
 };
 
 export const getConfigPath = (): string => {
   const input = process.env["HOPS_CONFIG"]?.trim();
 
   if (!input || input === "") {
-    console.warn(
-      "ℹ️ HOPS_CONFIG env variable is not set, falling back to default"
-    );
+    log.warn("HOPS_CONFIG environment variable not set, using default");
   }
 
   return resolve(input || `${homedir()}/hops.yml`);

@@ -8,8 +8,4 @@ export type Machine = {
 export type Config = {
   readonly brewfile: string;
   readonly machines: Record<string, Machine>;
-  metadata?: {
-    readonly path: string;
-    readonly version: string;
-  };
 };
