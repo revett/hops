@@ -1,18 +1,18 @@
+import { constants } from "node:fs";
+import { access, readFile } from "node:fs/promises";
+import { homedir } from "node:os";
+import { resolve } from "node:path";
+import { log } from "@clack/prompts";
+import { type Result, err, ok } from "neverthrow";
+import YAML from "yaml";
 import type { Config } from "../types/config";
 import { version } from "./version";
-import { access, readFile } from "fs/promises";
-import { constants } from "fs";
-import YAML from "yaml";
-import { homedir } from "os";
-import { resolve } from "path";
-import { Result, ok, err } from "neverthrow";
-import { log } from "@clack/prompts";
 
 type ConfigResult = {
   config: Config;
   path: string;
   version: string;
-}
+};
 
 export const getConfig = async (): Promise<Result<ConfigResult, Error>> => {
   const path = getConfigPath();
@@ -49,6 +49,7 @@ export const getConfig = async (): Promise<Result<ConfigResult, Error>> => {
 };
 
 export const getConfigPath = (): string => {
+  // biome-ignore lint/complexity/useLiteralKeys: It flip flops between lint failures for both.
   const input = process.env["HOPS_CONFIG"]?.trim();
 
   if (!input || input === "") {

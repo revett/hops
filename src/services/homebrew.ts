@@ -1,16 +1,16 @@
 import { log } from "@clack/prompts";
 import { execa } from "execa";
-import { Result, ok, err } from "neverthrow";
+import { type Result, err, ok } from "neverthrow";
 
 export function createEnv(brewfilePath: string): Record<string, string> {
   return {
     HOMEBREW_BUNDLE_FILE: brewfilePath,
-  }
+  };
 }
 
 export async function listTaps(
   brewfilePath: string,
-  prefix: string
+  prefix: string,
 ): Promise<Result<void, Error>> {
   const result = await execa({
     env: createEnv(brewfilePath),
@@ -23,20 +23,20 @@ export async function listTaps(
     console.log(result.message);
     return err(
       new Error(
-        `Homebrew command failed with exit code ${result.exitCode}: brew bundle list --taps`
-      )
+        `Homebrew command failed with exit code ${result.exitCode}: brew bundle list --taps`,
+      ),
     );
   }
 
   const lines = result.stdout.filter(Boolean);
-  log.info(lines.map(l => `${prefix} ${l}`).join('\n'));
+  log.info(lines.map((l) => `${prefix} ${l}`).join("\n"));
 
   return ok(undefined);
 }
 
 export async function listFormulae(
   brewfilePath: string,
-  prefix: string
+  prefix: string,
 ): Promise<Result<void, Error>> {
   const result = await execa({
     env: createEnv(brewfilePath),
@@ -49,20 +49,20 @@ export async function listFormulae(
     console.log(result.message);
     return err(
       new Error(
-        `Homebrew command failed with exit code ${result.exitCode}: brew bundle list --brews`
-      )
+        `Homebrew command failed with exit code ${result.exitCode}: brew bundle list --brews`,
+      ),
     );
   }
 
   const lines = result.stdout.filter(Boolean);
-  log.info(lines.map(l => `${prefix} ${l}`).join('\n'));
+  log.info(lines.map((l) => `${prefix} ${l}`).join("\n"));
 
   return ok(undefined);
 }
 
 export async function listCasks(
   brewfilePath: string,
-  prefix: string
+  prefix: string,
 ): Promise<Result<void, Error>> {
   const result = await execa({
     env: createEnv(brewfilePath),
@@ -75,21 +75,22 @@ export async function listCasks(
     console.log(result.message);
     return err(
       new Error(
-        `Homebrew command failed with exit code ${result.exitCode}: brew bundle list --casks`
-      )
+        `Homebrew command failed with exit code ${result.exitCode}: brew bundle list --casks`,
+      ),
     );
   }
 
   const lines = result.stdout.filter(Boolean);
-  log.info(lines.map(l => `${prefix} ${l}`).join('\n'));
+  log.info(lines.map((l) => `${prefix} ${l}`).join("\n"));
 
   return ok(undefined);
 }
 
 export async function listFloatingPackages(
   brewfilePath: string,
-  prefix: string
-): Promise<Result<boolean, Error>> { // Returns (ok, err) where ok is true if no packages to remove
+  prefix: string,
+): Promise<Result<boolean, Error>> {
+  // Returns (ok, err) where ok is true if no packages to remove
   const result = await execa({
     env: createEnv(brewfilePath),
     lines: true,
@@ -102,14 +103,14 @@ export async function listFloatingPackages(
     "Would uninstall ",
     "Would `brew cleanup`:",
     "Run `brew bundle cleanup",
-  ]
+  ];
 
-  const lines = result.stdout.filter(l => {
-    return !blockListLinePrefixes.some(prefix => l.startsWith(prefix));
+  const lines = result.stdout.filter((l) => {
+    return !blockListLinePrefixes.some((prefix) => l.startsWith(prefix));
   });
 
   // Remove "Would remove: " prefix from lines that start with it
-  const processedLines = lines.map(l => {
+  const processedLines = lines.map((l) => {
     if (l.startsWith("Would remove: ")) {
       return l.substring("Would remove: ".length);
     }
@@ -117,7 +118,7 @@ export async function listFloatingPackages(
   });
 
   if (processedLines.length > 0) {
-    log.info(processedLines.map(l => `${prefix} ${l}`).join('\n'));
+    log.info(processedLines.map((l) => `${prefix} ${l}`).join("\n"));
     return ok(false);
   }
 
@@ -125,7 +126,7 @@ export async function listFloatingPackages(
 }
 
 export async function forceCleanup(
-  brewfilePath: string
+  brewfilePath: string,
 ): Promise<Result<void, Error>> {
   const result = await execa({
     env: createEnv(brewfilePath),
@@ -138,8 +139,8 @@ export async function forceCleanup(
     console.log(result.message);
     return err(
       new Error(
-        `Homebrew command failed with exit code ${result.exitCode}: brew bundle --force cleanup`
-      )
+        `Homebrew command failed with exit code ${result.exitCode}: brew bundle --force cleanup`,
+      ),
     );
   }
 
@@ -147,7 +148,7 @@ export async function forceCleanup(
 }
 
 export async function install(
-  brewfilePath: string
+  brewfilePath: string,
 ): Promise<Result<void, Error>> {
   const result = await execa({
     env: createEnv(brewfilePath),
@@ -160,8 +161,8 @@ export async function install(
     console.log(result.message);
     return err(
       new Error(
-        `Homebrew command failed with exit code ${result.exitCode}: brew bundle install`
-      )
+        `Homebrew command failed with exit code ${result.exitCode}: brew bundle install`,
+      ),
     );
   }
 
@@ -169,7 +170,7 @@ export async function install(
 }
 
 export async function check(
-  brewfilePath: string
+  brewfilePath: string,
 ): Promise<Result<void, Error>> {
   const result = await execa({
     env: createEnv(brewfilePath),
@@ -182,19 +183,19 @@ export async function check(
     console.log(result.message);
     return err(
       new Error(
-        `Homebrew command failed with exit code ${result.exitCode}: brew bundle check`
-      )
+        `Homebrew command failed with exit code ${result.exitCode}: brew bundle check`,
+      ),
     );
   }
 
   const lines = result.stdout.filter(Boolean);
 
-  if (lines.length === 1 && lines[0]?.endsWith('.')) {
+  if (lines.length === 1 && lines[0]?.endsWith(".")) {
     log.info(lines[0].substring(0, lines[0].length - 1));
     return ok(undefined);
   }
 
-  log.info(lines.join('\n'));
+  log.info(lines.join("\n"));
 
   return ok(undefined);
 }

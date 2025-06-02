@@ -1,16 +1,16 @@
+import { log } from "@clack/prompts";
 import { cac } from "cac";
 import { commands } from "./commands";
 import { version } from "./utils/version";
-import { log } from "@clack/prompts";
 
 const cli = cac("hops");
 
-commands.forEach((cmd) => {
+for (const cmd of commands) {
   const command = cli.command(cmd.name, cmd.description);
 
-  cmd.options?.forEach((opt) => {
+  for (const opt of cmd.options ?? []) {
     command.option(opt.flags, opt.description);
-  });
+  }
 
   command.action(async (options) => {
     const result = await cmd.action(options);
@@ -18,7 +18,7 @@ commands.forEach((cmd) => {
       throw result.error;
     }
   });
-});
+}
 
 cli.help();
 cli.version(version);
