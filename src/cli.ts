@@ -1,8 +1,7 @@
 import { cac } from "cac";
 import { commands } from "./commands";
 import { version } from "./utils/version";
-import { log, intro } from "@clack/prompts";
-import pc from "picocolors";
+import { log } from "@clack/prompts";
 
 const cli = cac("hops");
 
@@ -31,7 +30,6 @@ if (!process.argv.slice(2).length) {
 
 // Find and run the command
 try {
-  intro(pc.bgGreen(pc.bold('hops')));
   cli.parse(process.argv, { run: false });
   await cli.runMatchedCommand();
 } catch (error) {

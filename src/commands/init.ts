@@ -7,7 +7,7 @@ import { writeFile } from "fs/promises";
 import YAML from "yaml";
 import { Result, ok, err } from "neverthrow";
 import pc from "picocolors";
-import { log } from "@clack/prompts";
+import { intro, log } from "@clack/prompts";
 
 // Default config with a few example packages to illustrate the structure
 const defaultConfig: Config = {
@@ -27,6 +27,7 @@ const defaultConfig: Config = {
 };
 
 const action: () => Promise<Result<void, Error>> = async () => {
+  intro(pc.bgGreen(pc.bold('hops')));
   log.step(pc.bold('Initializing new hops.yml config'));
 
   const path = getConfigPath();
