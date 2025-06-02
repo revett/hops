@@ -1,5 +1,5 @@
 import { generateBrewfile } from "../services/brewfile";
-import { confirm, isCancel, log } from '@clack/prompts';
+import { confirm, intro, isCancel, log } from '@clack/prompts';
 import * as homebrew from "../services/homebrew";
 import type { Command } from "../types/command";
 import { getConfig } from "../utils/config";
@@ -13,6 +13,7 @@ type ApplyOptions = {
 const action: (options: ApplyOptions) => Promise<Result<void, Error>> = async (
   options
 ) => {
+  intro(pc.bgGreen(pc.bold('hops')));
   log.step(pc.bold('Reading hops.yml'));
 
   if (!options.machine) {

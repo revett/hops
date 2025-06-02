@@ -3,7 +3,7 @@ import { generateBrewfile } from "../services/brewfile";
 import type { Command } from "../types/command";
 import { getConfig } from "../utils/config";
 import pc from "picocolors"
-import { log } from "@clack/prompts";
+import { intro, log } from "@clack/prompts";
 
 type GenerateOptions = {
   machine?: string;
@@ -12,6 +12,7 @@ type GenerateOptions = {
 const action: (
   options: GenerateOptions
 ) => Promise<Result<void, Error>> = async (options) => {
+  intro(pc.bgGreen(pc.bold('hops')));
   log.step(pc.bold('Reading hops.yml'));
 
   if (!options.machine) {
