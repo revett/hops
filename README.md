@@ -141,4 +141,8 @@ make build
 
 # Debug local binary
 ./hops -h
+
+# Linting/formatting
+bun biome:check
+bun biome:fix
 ```

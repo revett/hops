@@ -1,25 +1,27 @@
 {
-  "name": "hops",
-  "version": "0.3.1",
-  "main": "src/cli.ts",
-  "repository": "git@github.com:revett/hops.git",
-  "author": "revett <2796074+revett@users.noreply.github.com>",
-  "license": "MIT",
-  "private": true,
-  "scripts": {
-    "lint": "bun run tsc --noEmit --strict"
-  },
-  "dependencies": {
-    "@clack/prompts": "^0.11.0",
-    "cac": "^6.7.14",
-    "dayjs": "^1.11.13",
-    "execa": "^9.6.0",
-    "neverthrow": "^8.2.0",
-    "picocolors": "^1.1.1",
-    "yaml": "^2.8.0"
-  },
-  "devDependencies": {
-    "@types/bun": "^1.2.14",
-    "@types/node": "^22.15.21"
-  }
+	"name": "hops",
+	"version": "0.3.1",
+	"main": "src/cli.ts",
+	"repository": "git@github.com:revett/hops.git",
+	"author": "revett <2796074+revett@users.noreply.github.com>",
+	"license": "MIT",
+	"private": true,
+	"scripts": {
+		"biome:check": "biome check .",
+		"biome:fix": "biome check --write ."
+	},
+	"dependencies": {
+		"@clack/prompts": "^0.11.0",
+		"cac": "^6.7.14",
+		"dayjs": "^1.11.13",
+		"execa": "^9.6.0",
+		"neverthrow": "^8.2.0",
+		"picocolors": "^1.1.1",
+		"yaml": "^2.8.0"
+	},
+	"devDependencies": {
+		"@biomejs/biome": "1.9.4",
+		"@types/bun": "^1.2.14",
+		"@types/node": "^22.15.21"
+	}
 }

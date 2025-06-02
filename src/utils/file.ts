@@ -1,11 +1,11 @@
-import { access } from "fs/promises";
-import { constants } from "fs";
+import { constants } from "node:fs";
+import { access } from "node:fs/promises";
 
 export const fileExists = async (path: string): Promise<boolean> => {
-  try {
-    await access(path, constants.F_OK);
-    return true;
-  } catch {
-    return false;
-  }
+	try {
+		await access(path, constants.F_OK);
+		return true;
+	} catch {
+		return false;
+	}
 };
