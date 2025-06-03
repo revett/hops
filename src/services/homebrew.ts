@@ -29,6 +29,10 @@ export async function listTaps(
   }
 
   const lines = result.stdout.filter(Boolean);
+  if (lines.length === 0) {
+    log.info(`${prefix} None`);
+    return ok(undefined);
+  }
   log.info(lines.map((l) => `${prefix} ${l}`).join("\n"));
 
   return ok(undefined);
@@ -55,6 +59,10 @@ export async function listFormulae(
   }
 
   const lines = result.stdout.filter(Boolean);
+  if (lines.length === 0) {
+    log.info(`${prefix} None`);
+    return ok(undefined);
+  }
   log.info(lines.map((l) => `${prefix} ${l}`).join("\n"));
 
   return ok(undefined);
@@ -81,6 +89,10 @@ export async function listCasks(
   }
 
   const lines = result.stdout.filter(Boolean);
+  if (lines.length === 0) {
+    log.info(`${prefix} None`);
+    return ok(undefined);
+  }
   log.info(lines.map((l) => `${prefix} ${l}`).join("\n"));
 
   return ok(undefined);

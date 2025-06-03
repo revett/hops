@@ -73,7 +73,7 @@ const action: (options: ApplyOptions) => Promise<Result<void, Error>> = async (
     return err(floating.error);
   }
   if (!floating.value) {
-    log.info(
+    log.warn(
       "Check if any of the above packages need to be added to your hops.yml",
     );
     const shouldContinue = await confirm({
@@ -93,7 +93,7 @@ const action: (options: ApplyOptions) => Promise<Result<void, Error>> = async (
 
     log.success("Cleanup complete");
   } else {
-    log.success("No packages to uninstall");
+    log.info("No packages to uninstall");
   }
 
   // Install and upgrade packages
