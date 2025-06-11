@@ -58,3 +58,45 @@ export const getConfigPath = (): string => {
 
   return resolve(input || `${homedir()}/hops.yml`);
 };
+
+export const getLastApplyPath = (): string => {
+  return resolve(`${homedir()}/.hops-last-apply`);
+};
+
+export const getLastApplyTime = async (): Promise<
+  Result<Date | null, Error>
+> => {
+  const path = getLastApplyPath();
+
+  try {
+    await access(path, constants.F_OK);
+  } catch {
+    return ok(null); // File doesn't exist, never applied before
+  }
+
+  try {
+    const file = await readFile(path, "utf8");
+    const timestamp = Number.parseInt(file.trim(), 10);
+    if (Number.isNaN(timestamp)) {
+      return err(new Error("Invalid timestamp in last apply file"));
+    }
+    return ok(new Date(timestamp));
+  } catch (error) {
+    const msg = error instanceof Error ? error.message : String(error);
+    return err(new Error(`Reading last apply file: ${msg}`));
+  }
+};
+
+export const setLastApplyTime = async (): Promise<Result<void, Error>> => {
+  const path = getLastApplyPath();
+  const timestamp = Date.now().toString();
+
+  try {
+    const { writeFile } = await import("node:fs/promises");
+    await writeFile(path, timestamp, "utf8");
+    return ok(undefined);
+  } catch (error) {
+    const msg = error instanceof Error ? error.message : String(error);
+    return err(new Error(`Writing last apply file: ${msg}`));
+  }
+};
