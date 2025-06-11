@@ -106,6 +106,9 @@ hops generate --machine work
 
 # Generate Brewfile and apply changes via Homebrew commands (install, upgrade, cleanup)
 hops apply --machine personal
+
+# Add to .zshrc to remind every week to run apply command
+hops reminder
 ```
 
 ## Examples

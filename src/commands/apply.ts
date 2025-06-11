@@ -4,7 +4,7 @@ import pc from "picocolors";
 import { generateBrewfile } from "../services/brewfile";
 import * as homebrew from "../services/homebrew";
 import type { Command } from "../types/command";
-import { getConfig } from "../utils/config";
+import { getConfig, getLastApplyPath, setLastApplyTime } from "../utils/config";
 
 type ApplyOptions = {
   machine?: string;
@@ -109,6 +109,15 @@ const action: (options: ApplyOptions) => Promise<Result<void, Error>> = async (
   const allInstalled = await homebrew.check(config.brewfile);
   if (allInstalled.isErr()) {
     return err(allInstalled.error);
+  }
+
+  // Update last run time for reminder feature
+  const lastApplyPath = getLastApplyPath();
+  log.step(pc.bold(`Updating timestamp: ${lastApplyPath}`));
+  const setLastApply = await setLastApplyTime();
+  if (setLastApply.isErr()) {
+    // Don't fail the entire command if we can't update the timestamp
+    log.warn("Could not update last apply time for reminders");
   }
 
   return ok(undefined);
