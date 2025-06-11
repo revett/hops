@@ -112,8 +112,7 @@ const action: (options: ApplyOptions) => Promise<Result<void, Error>> = async (
   }
 
   // Update last run time for reminder feature
-  const lastApplyPath = getLastApplyPath();
-  log.step(pc.bold(`Updating timestamp: ${lastApplyPath}`));
+  log.success(`Updating timestamp: ${getLastApplyPath()}`);
   const setLastApply = await setLastApplyTime();
   if (setLastApply.isErr()) {
     // Don't fail the entire command if we can't update the timestamp
