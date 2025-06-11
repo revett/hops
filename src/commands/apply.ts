@@ -98,6 +98,7 @@ const action: (options: ApplyOptions) => Promise<Result<void, Error>> = async (
 
   // Install and upgrade packages
   log.step(pc.bold("Install/upgrade packages from Brewfile"));
+  console.log(pc.gray("│")); // Unable to use clack/prompts logging here as streaming so need pipe
   const install = await homebrew.install(config.brewfile);
   if (install.isErr()) {
     return err(install.error);
