@@ -1,5 +1,5 @@
 import { constants } from "node:fs";
-import { access, readFile } from "node:fs/promises";
+import { access, readFile, writeFile } from "node:fs/promises";
 import { homedir } from "node:os";
 import { resolve } from "node:path";
 import { log } from "@clack/prompts";
@@ -92,7 +92,6 @@ export const setLastApplyTime = async (): Promise<Result<void, Error>> => {
   const timestamp = Date.now().toString();
 
   try {
-    const { writeFile } = await import("node:fs/promises");
     await writeFile(path, timestamp, "utf8");
     return ok(undefined);
   } catch (error) {
