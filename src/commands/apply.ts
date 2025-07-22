@@ -86,6 +86,7 @@ const action: (options: ApplyOptions) => Promise<Result<void, Error>> = async (
     }
 
     log.step(pc.bold("Removing packages"));
+    console.log(pc.gray("│"));
     const cleanup = await homebrew.forceCleanup(config.brewfile);
     if (cleanup.isErr()) {
       return err(cleanup.error);
