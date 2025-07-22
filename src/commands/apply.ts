@@ -4,7 +4,12 @@ import pc from "picocolors";
 import { generateBrewfile } from "../services/brewfile";
 import * as homebrew from "../services/homebrew";
 import type { Command } from "../types/command";
-import { getConfig, getLastApplyPath, setLastApplyTime } from "../utils/config";
+import {
+  getConfig,
+  getLastApplyPath,
+  getLastApplyTime,
+  setLastApplyTime,
+} from "../utils/config";
 
 type ApplyOptions = {
   machine?: string;
@@ -29,11 +34,25 @@ const action: (options: ApplyOptions) => Promise<Result<void, Error>> = async (
   }
   const { config, version, path } = configResult.value;
 
+  const lastApplyResult = await getLastApplyTime();
+  if (lastApplyResult.isErr()) {
+    return err(lastApplyResult.error);
+  }
+
+  let lastApply = "Never";
+  if (lastApplyResult.isOk() && lastApplyResult.value) {
+    const daysSince = Math.floor(
+      (Date.now() - lastApplyResult.value.getTime()) / (1000 * 60 * 60 * 24),
+    );
+    lastApply = `${daysSince} day${daysSince === 1 ? "" : "s"}`;
+  }
+
   log.info(
     [
       `Version: v${version}`,
       `Config: ${path}`,
       `Machine: ${options.machine}`,
+      `Last apply: ${lastApply}`,
     ].join("\n"),
   );
 
