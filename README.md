@@ -46,19 +46,40 @@ machines:
 
 ## Install
 
-```bash
-# Install via GitHub release
-curl -L https://github.com/revett/hops/releases/download/vX.Y.Z/hops_X.Y.Z_darwin_arm64.tar.gz -o hops.tar.gz
-tar -xzf hops.tar.gz
-xattr -c ./hops
-sudo mv hops /usr/local/bin
-hops -h
+### GitHub Release
 
-# Build from source (required Bun)
+```bash
+# Download the latest release
+# Visit → https://github.com/revett/hops/releases
+
+# Extract binary from archive
+tar -xzf hops_X.Y.Z_darwin_arm64.tar.gz
+
+# Stop macOS' Gatekeeper from blocking the binary
+xattr -c ./hops
+
+# Move binary
+sudo mv hops /usr/local/bin
+
+# Verify install
+hops -h
+```
+
+### Build from Source
+
+
+```bash
+# Clone repo locally
 git clone https://github.com/revett/hops.git
+
+# Build binary
 cd hops
 make build
+
+# Move binary
 sudo mv hops /usr/local/bin
+
+# Verify install
 hops -h
 ```
 
