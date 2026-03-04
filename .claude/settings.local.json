@@ -7,7 +7,7 @@
       "Bash(make *)",
       "Bash(git *)",
       "Bash(./hops *)",
-      "Bash(HOPS_CONFIG=./hops.example.yml ./hops *)",
+      "Bash(HOPS_CONFIG=* ./hops*)",
       "Edit",
       "MultiEdit",
       "WebFetch",
