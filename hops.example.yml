@@ -19,8 +19,8 @@ machines:
       - spotify # Deliberately duplicated in shared.casks
   work:
     formulae:
-      - git # Deliberately duplicated in shared.formulae
       - gh
+      - git # Deliberately duplicated in shared.formulae
     casks:
       - cursor
       - slack
