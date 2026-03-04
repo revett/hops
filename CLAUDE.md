@@ -9,7 +9,8 @@
 ## Build & Test
 
 - Use the `Makefile` for building
-- Test locally: `make build && HOPS_CONFIG=./hops.example.yml ./hops <command>`
+- Test locally: `make build && ./hops <command>`
+- Note that `HOPS_CONFIG=./hops.example.yml` has been set in the local Claude settings for the repo
 - Always run `bun biome:fix` after making code changes
 
 ## Conventions

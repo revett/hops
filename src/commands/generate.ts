@@ -2,6 +2,7 @@ import { confirm, intro, isCancel, log, outro } from "@clack/prompts";
 import { err, ok, type Result } from "neverthrow";
 import pc from "picocolors";
 import { findDuplicates, generateBrewfile } from "../services/brewfile";
+import { formatConfig } from "../services/format";
 import type { Command } from "../types/command";
 import { getConfig } from "../utils/config";
 
@@ -35,6 +36,12 @@ const action: (options: GenerateOptions) => Promise<Result<void, Error>> =
         `Machine: ${options.machine}`,
       ].join("\n"),
     );
+
+    log.step(pc.bold("Formatting"));
+    const formatResult = await formatConfig(path);
+    if (formatResult.isErr()) {
+      return err(formatResult.error);
+    }
 
     const duplicates = findDuplicates(config.machines);
     if (duplicates.length > 0) {

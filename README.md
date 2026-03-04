@@ -107,6 +107,9 @@ hops generate --machine work
 # Generate Brewfile and apply changes via Homebrew commands (install, upgrade, cleanup)
 hops apply --machine personal
 
+# Format hops.yml (sort packages A-Z, order sections, 2-space indent)
+hops format
+
 # Add to .zshrc to remind every week to run apply command
 hops reminder
 ```
@@ -128,7 +131,7 @@ April 2025, the `brew bundle` command looks for VS Code variants, see
 
 ### Releases
 
-1. Bump version in `package.json` and push as `Bump version to X.Y.Z` commit
+1. Ensure that version in `package.json` is bumped
 1. `git tag -a vX.Y.Z -m "Release vX.Y.Z"`
 1. `git push origin vX.Y.Z`
 1. `make release VERSION=vX.Y.Z`

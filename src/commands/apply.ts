@@ -2,6 +2,7 @@ import { confirm, intro, isCancel, log } from "@clack/prompts";
 import { err, ok, type Result } from "neverthrow";
 import pc from "picocolors";
 import { findDuplicates, generateBrewfile } from "../services/brewfile";
+import { formatConfig } from "../services/format";
 import * as homebrew from "../services/homebrew";
 import type { Command } from "../types/command";
 import {
@@ -56,6 +57,12 @@ const action: (options: ApplyOptions) => Promise<Result<void, Error>> = async (
       `Last apply: ${lastApply}`,
     ].join("\n"),
   );
+
+  log.step(pc.bold("Formatting"));
+  const formatResult = await formatConfig(path);
+  if (formatResult.isErr()) {
+    return err(formatResult.error);
+  }
 
   const duplicates = findDuplicates(config.machines);
   if (duplicates.length > 0) {
