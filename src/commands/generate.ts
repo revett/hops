@@ -29,6 +29,7 @@ const action: (options: GenerateOptions) => Promise<Result<void, Error>> =
 
     log.info(
       [
+        "Docs: https://github.com/revett/hops",
         `Version: v${version}`,
         `Config: ${path}`,
         `Machine: ${options.machine}`,

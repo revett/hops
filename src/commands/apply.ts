@@ -49,6 +49,7 @@ const action: (options: ApplyOptions) => Promise<Result<void, Error>> = async (
 
   log.info(
     [
+      "Docs: https://github.com/revett/hops",
       `Version: v${version}`,
       `Config: ${path}`,
       `Machine: ${options.machine}`,
