@@ -9,7 +9,7 @@
 ## Build & Test
 
 - Use the `Makefile` for building
-- Test locally: `make build && HOPS_CONFIG=./hops.example.yml ./hops generate --machine personal`
+- Test locally: `make build && HOPS_CONFIG=./hops.example.yml ./hops <command>`
 - Always run `bun biome:fix` after making code changes
 
 ## Conventions

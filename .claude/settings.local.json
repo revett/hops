@@ -1,0 +1,18 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-settings.json",
+  "permissions": {
+    "allow": [
+      "Bash(bun *)",
+      "Bash(biome *)",
+      "Bash(make *)",
+      "Bash(git *)",
+      "Bash(./hops *)",
+      "WebFetch",
+      "WebSearch",
+      "Write"
+    ]
+  },
+  "env": {
+    "HOPS_CONFIG": "./hops.example.yml"
+  }
+}
