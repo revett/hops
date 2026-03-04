@@ -6,11 +6,11 @@
 - Manages Homebrew packages across multiple machines
 - Via a single `hops.yml` config
 
-## Build & Run
+## Build & Test
 
 - Use the `Makefile` for building
-- Use `HOPS_CONFIG=./hops.example.yml` to test with the example config
-- Linting/formatting via Biome: `bun biome:check` / `bun biome:fix`.
+- Test locally: `make build && HOPS_CONFIG=./hops.example.yml ./hops generate --machine personal`
+- Always run `bun biome:fix` after making code changes
 
 ## Conventions
 
@@ -18,3 +18,21 @@
 - `@clack/prompts` for all user-facing output
 - `picocolors` for text styling
 - `shared` is a reserved machine name, merged with the target machine during generation
+
+## Workflow
+
+- Keep CLAUDE.md, README.md, and code comments up to date as part of every change
+- Refactor adjacent code when it improves clarity, don't wait to be asked
+
+## Operating Principles
+
+1. Build using boring technology choices, that LLMs are great at understanding and working with
+1. Keep things simple!
+1. Document as you go, and maintain documentation as you go
+1. Developer experience is important and a first class citizen
+1. No magic
+1. Fail loudly and early
+1. Prefer well known idioms and patterns over custom abstractions
+1. Keep dependencies to a minimum
+1. The end goal of technical decisions is to allow zero humans, but agents, to only write/ship code
+1. Code prioritises consistency and readability, so that agents can follow patterns, not intuition
