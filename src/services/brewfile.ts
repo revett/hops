@@ -1,7 +1,7 @@
 import { writeFile } from "node:fs/promises";
 import { log } from "@clack/prompts";
 import dayjs from "dayjs";
-import { type Result, err, ok } from "neverthrow";
+import { err, ok, type Result } from "neverthrow";
 import pc from "picocolors";
 import type { Config, Machine } from "../types/config";
 

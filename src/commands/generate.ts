@@ -1,5 +1,5 @@
 import { confirm, intro, isCancel, log, outro } from "@clack/prompts";
-import { type Result, err, ok } from "neverthrow";
+import { err, ok, type Result } from "neverthrow";
 import pc from "picocolors";
 import { findDuplicates, generateBrewfile } from "../services/brewfile";
 import type { Command } from "../types/command";

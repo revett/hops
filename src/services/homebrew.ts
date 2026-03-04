@@ -1,6 +1,6 @@
 import { log } from "@clack/prompts";
 import { execa } from "execa";
-import { type Result, err, ok } from "neverthrow";
+import { err, ok, type Result } from "neverthrow";
 
 export function createEnv(brewfilePath: string): Record<string, string> {
   return {

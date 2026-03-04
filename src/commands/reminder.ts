@@ -1,4 +1,4 @@
-import { type Result, err, ok } from "neverthrow";
+import { err, ok, type Result } from "neverthrow";
 import pc from "picocolors";
 import type { Command } from "../types/command";
 import { getConfig, getLastApplyTime } from "../utils/config";
