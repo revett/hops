@@ -1,7 +1,7 @@
 import { writeFile } from "node:fs/promises";
 import { homedir } from "node:os";
 import { intro, log } from "@clack/prompts";
-import { type Result, err, ok } from "neverthrow";
+import { err, ok, type Result } from "neverthrow";
 import pc from "picocolors";
 import YAML from "yaml";
 import type { Command } from "../types/command";

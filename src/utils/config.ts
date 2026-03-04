@@ -3,7 +3,7 @@ import { access, readFile, writeFile } from "node:fs/promises";
 import { homedir } from "node:os";
 import { resolve } from "node:path";
 import { log } from "@clack/prompts";
-import { type Result, err, ok } from "neverthrow";
+import { err, ok, type Result } from "neverthrow";
 import YAML from "yaml";
 import type { Config } from "../types/config";
 import { version } from "./version";
