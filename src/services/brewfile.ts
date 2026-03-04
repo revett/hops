@@ -3,7 +3,49 @@ import { log } from "@clack/prompts";
 import dayjs from "dayjs";
 import { type Result, err, ok } from "neverthrow";
 import pc from "picocolors";
-import type { Config } from "../types/config";
+import type { Config, Machine } from "../types/config";
+
+type CategoryName = "taps" | "formulae" | "casks" | "cursor";
+
+const categories: CategoryName[] = ["taps", "formulae", "casks", "cursor"];
+
+export const findDuplicates = (
+  machines: Record<string, Machine>,
+): string[] => {
+  const found = new Set<string>();
+
+  // Check for duplicates within each machine's lists.
+  for (const pkg of Object.values(machines)) {
+    for (const cat of categories) {
+      const items = pkg[cat];
+      if (!items) continue;
+
+      const seen = new Set<string>();
+      for (const item of items) {
+        if (seen.has(item)) {
+          found.add(item);
+        }
+        seen.add(item);
+      }
+    }
+  }
+
+  // Check for duplicates across machines.
+  const machineEntries = Object.values(machines);
+  for (const cat of categories) {
+    const seen = new Map<string, boolean>();
+    for (const pkg of machineEntries) {
+      for (const item of pkg[cat] ?? []) {
+        if (seen.has(item)) {
+          found.add(item);
+        }
+        seen.set(item, true);
+      }
+    }
+  }
+
+  return [...found].sort();
+};
 
 const displayItems = (
   lines: string[],

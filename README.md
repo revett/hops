@@ -143,6 +143,9 @@ make build
 # Debug local binary
 ./hops -h
 
+# Run command
+make build && HOPS_CONFIG=./hops.example.yml ./hops generate --machine personal
+
 # Linting/formatting
 bun biome:check
 bun biome:fix
