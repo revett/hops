@@ -12,7 +12,7 @@
   },
   "dependencies": {
     "@clack/prompts": "^1.0.0",
-    "cac": "^6.7.14",
+    "cac": "^7.0.0",
     "dayjs": "^1.11.13",
     "execa": "^9.6.0",
     "neverthrow": "^8.2.0",
