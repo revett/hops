@@ -66,7 +66,7 @@ const action: (options: ApplyOptions) => Promise<Result<void, Error>> = async (
     });
 
     if (isCancel(shouldContinue) || !shouldContinue) {
-      log.error("Exiting early");
+      log.error(pc.bold("Exiting early"));
       process.exit(0);
     }
   }

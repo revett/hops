@@ -45,7 +45,7 @@ const action: (options: GenerateOptions) => Promise<Result<void, Error>> =
       });
 
       if (isCancel(shouldContinue) || !shouldContinue) {
-        log.error("Exiting early");
+        log.error(pc.bold("Exiting early"));
         process.exit(0);
       }
     }
