@@ -43,6 +43,12 @@ const action: (options: GenerateOptions) => Promise<Result<void, Error>> =
       return err(formatResult.error);
     }
 
+    if (formatResult.value) {
+      log.success("Fixed formatting issues");
+    } else {
+      log.success("No formatting issues");
+    }
+
     const duplicates = findDuplicates(config.machines);
     if (duplicates.length > 0) {
       log.warn(pc.bold("Duplicates found in hops.yml"));

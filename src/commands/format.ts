@@ -26,7 +26,11 @@ const action: () => Promise<Result<void, Error>> = async () => {
     return err(result.error);
   }
 
-  log.success(`Formatted: ${path}`);
+  if (result.value) {
+    log.success("Fixed formatting issues");
+  } else {
+    log.success("No formatting issues");
+  }
   outro(pc.bold("Done"));
   return ok(undefined);
 };

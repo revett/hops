@@ -76,7 +76,7 @@ const sortSeqAlphabetically = (seq: YAMLSeq): void => {
  */
 export const formatConfig = async (
   path: string,
-): Promise<Result<void, Error>> => {
+): Promise<Result<boolean, Error>> => {
   let raw: string;
   try {
     raw = await readFile(path, "utf8");
@@ -118,13 +118,16 @@ export const formatConfig = async (
   }
 
   const formatted = doc.toString({ indent: 2 });
+  const changed = formatted !== raw;
 
-  try {
-    await writeFile(path, formatted, "utf8");
-  } catch (error) {
-    const msg = error instanceof Error ? error.message : String(error);
-    return err(new Error(`Writing formatted config: ${msg}`));
+  if (changed) {
+    try {
+      await writeFile(path, formatted, "utf8");
+    } catch (error) {
+      const msg = error instanceof Error ? error.message : String(error);
+      return err(new Error(`Writing formatted config: ${msg}`));
+    }
   }
 
-  return ok(undefined);
+  return ok(changed);
 };
