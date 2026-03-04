@@ -64,6 +64,12 @@ const action: (options: ApplyOptions) => Promise<Result<void, Error>> = async (
     return err(formatResult.error);
   }
 
+  if (formatResult.value) {
+    log.success("Fixed formatting issues");
+  } else {
+    log.success("No formatting issues");
+  }
+
   const duplicates = findDuplicates(config.machines);
   if (duplicates.length > 0) {
     log.warn(pc.bold("Duplicates found in hops.yml"));
