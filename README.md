@@ -136,17 +136,4 @@ April 2025, the `brew bundle` command looks for VS Code variants, see
 
 ### Local Development
 
-```bash
-# Build local binary
-make build
-
-# Debug local binary
-./hops -h
-
-# Run command
-make build && HOPS_CONFIG=./hops.example.yml ./hops generate --machine personal
-
-# Linting/formatting
-bun biome:check
-bun biome:fix
-```
+See [CLAUDE.md](./CLAUDE.md).

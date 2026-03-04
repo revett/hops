@@ -9,9 +9,7 @@ type CategoryName = "taps" | "formulae" | "casks" | "cursor";
 
 const categories: CategoryName[] = ["taps", "formulae", "casks", "cursor"];
 
-export const findDuplicates = (
-  machines: Record<string, Machine>,
-): string[] => {
+export const findDuplicates = (machines: Record<string, Machine>): string[] => {
   const found = new Set<string>();
 
   // Check for duplicates within each machine's lists.

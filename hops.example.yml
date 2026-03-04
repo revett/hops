@@ -1,4 +1,4 @@
-brewfile: ~/Brewfile
+brewfile: ./Brewfile.example
 reminder: 14
 machines:
   shared:
