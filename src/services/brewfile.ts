@@ -131,16 +131,13 @@ export async function generateBrewfile(
   displayItems(lines, casks, "Casks", "cask");
   displayItems(lines, cursor, "Cursor", "vscode");
 
-  await writeFile(brewfile, lines.join("\n"), "utf8")
-    .then(() => {
-      log.success(`Wrote ${lines.length} lines to: ${brewfile}`);
-    })
-    .catch((error) => {
-      const msg = error instanceof Error ? error.message : String(error);
-      return err(
-        new Error(`Unable to write to Brewfile at ${brewfile}: ${msg}`),
-      );
-    });
+  try {
+    await writeFile(brewfile, lines.join("\n"), "utf8");
+  } catch (error) {
+    const msg = error instanceof Error ? error.message : String(error);
+    return err(new Error(`Unable to write to Brewfile at ${brewfile}: ${msg}`));
+  }
 
+  log.success(`Wrote ${lines.length} lines to: ${brewfile}`);
   return ok(undefined);
 }
