@@ -41,3 +41,4 @@ TODO.txt
 hops
 # Added by goreleaser init:
 dist/
+.claude/

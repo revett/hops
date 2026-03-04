@@ -1,0 +1,29 @@
+brewfile: ./Brewfile.example
+reminder: 14
+machines:
+  shared:
+    taps:
+      - homebrew/bundle
+      - homebrew/cask-fonts
+    formulae:
+      - coreutils
+      - git
+      - jq
+    casks:
+      - 1password
+      - raycast
+      - spotify
+  personal:
+    casks:
+      - adobe-creative-cloud
+      - spotify # Deliberately duplicated in shared.casks
+  work:
+    formulae:
+      - git # Deliberately duplicated in shared.formulae
+      - gh
+    casks:
+      - cursor
+      - slack
+    cursor:
+      - dbaeumer.vscode-eslint
+      - github.github-vscode-theme

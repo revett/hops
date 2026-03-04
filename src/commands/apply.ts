@@ -1,7 +1,7 @@
 import { confirm, intro, isCancel, log } from "@clack/prompts";
 import { type Result, err, ok } from "neverthrow";
 import pc from "picocolors";
-import { generateBrewfile } from "../services/brewfile";
+import { findDuplicates, generateBrewfile } from "../services/brewfile";
 import * as homebrew from "../services/homebrew";
 import type { Command } from "../types/command";
 import {
@@ -49,12 +49,28 @@ const action: (options: ApplyOptions) => Promise<Result<void, Error>> = async (
 
   log.info(
     [
+      "Docs: https://github.com/revett/hops",
       `Version: v${version}`,
       `Config: ${path}`,
       `Machine: ${options.machine}`,
       `Last apply: ${lastApply}`,
     ].join("\n"),
   );
+
+  const duplicates = findDuplicates(config.machines);
+  if (duplicates.length > 0) {
+    log.warn(pc.bold("Duplicates found in hops.yml"));
+    log.info(duplicates.map((d) => `- ${d}`).join("\n"));
+
+    const shouldContinue = await confirm({
+      message: "Continue?",
+    });
+
+    if (isCancel(shouldContinue) || !shouldContinue) {
+      log.error(pc.bold("Exiting early"));
+      process.exit(0);
+    }
+  }
 
   const generate = await generateBrewfile(
     config,
