@@ -8,6 +8,7 @@
       "Bash(git *)",
       "Bash(./hops *)",
       "Bash(HOPS_CONFIG=* ./hops*)",
+      "Bash(wc -l *)",
       "Edit",
       "MultiEdit",
       "WebFetch",
