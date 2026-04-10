@@ -4,10 +4,20 @@ import dayjs from "dayjs";
 import { err, ok, type Result } from "neverthrow";
 import pc from "picocolors";
 import type { Config, Machine } from "../types/config";
+import { collectNpmConfig } from "./npm";
 
 type CategoryName = "taps" | "formulae" | "casks" | "cursor";
 
 const categories: CategoryName[] = ["taps", "formulae", "casks", "cursor"];
+
+/**
+ * Extract the flat package lists from npm sections for duplicate checking.
+ */
+function getNpmPackages(machines: Record<string, Machine>): string[][] {
+  return Object.values(machines)
+    .map((m) => [...(m.npm?.packages ?? [])])
+    .filter((pkgs) => pkgs.length > 0);
+}
 
 export const findDuplicates = (machines: Record<string, Machine>): string[] => {
   const found = new Set<string>();
@@ -28,12 +38,36 @@ export const findDuplicates = (machines: Record<string, Machine>): string[] => {
     }
   }
 
+  // Check for duplicates within npm packages per machine.
+  for (const pkgs of getNpmPackages(machines)) {
+    const seen = new Set<string>();
+    for (const item of pkgs) {
+      if (seen.has(item)) {
+        found.add(item);
+      }
+      seen.add(item);
+    }
+  }
+
   // Check for duplicates across machines.
   const machineEntries = Object.values(machines);
   for (const cat of categories) {
     const seen = new Map<string, boolean>();
     for (const pkg of machineEntries) {
       for (const item of pkg[cat] ?? []) {
+        if (seen.has(item)) {
+          found.add(item);
+        }
+        seen.set(item, true);
+      }
+    }
+  }
+
+  // Check for npm package duplicates across machines.
+  {
+    const seen = new Map<string, boolean>();
+    for (const pkgs of getNpmPackages(machines)) {
+      for (const item of pkgs) {
         if (seen.has(item)) {
           found.add(item);
         }
@@ -110,12 +144,16 @@ export async function generateBrewfile(
     );
   }
 
+  const npmConfig = collectNpmConfig(config, machine);
+  const npmCount = npmConfig?.packages.length ?? 0;
+
   log.info(
     [
       `${taps.size} ${taps.size === 1 ? "tap" : "taps"}`,
       `${formulae.size} ${formulae.size === 1 ? "formula" : "formulae"}`,
       `${casks.size} ${casks.size === 1 ? "cask" : "casks"}`,
       `${cursor.size} ${cursor.size === 1 ? "cursor extension" : "cursor extensions"}`,
+      `${npmCount} npm ${npmCount === 1 ? "package" : "packages"}`,
     ].join("\n"),
   );
 

@@ -3,7 +3,7 @@ import { err, ok, type Result } from "neverthrow";
 import YAML, { isMap, isScalar, isSeq, type YAMLMap, type YAMLSeq } from "yaml";
 
 const TOP_LEVEL_ORDER = ["brewfile", "reminder", "machines"];
-const MACHINE_SECTION_ORDER = ["taps", "formulae", "casks", "cursor"];
+const MACHINE_SECTION_ORDER = ["taps", "formulae", "casks", "cursor", "npm"];
 
 /**
  * Sort a YAMLMap's items by a predefined key order. Keys not in the order list
@@ -112,6 +112,20 @@ export const formatConfig = async (
       for (const sectionPair of machineMap.items) {
         if (isSeq(sectionPair.value)) {
           sortSeqAlphabetically(sectionPair.value);
+        }
+
+        // Handle npm section: sort keys (version, packages) and sort packages list
+        const sectionKey = isScalar(sectionPair.key)
+          ? String(sectionPair.key.value)
+          : "";
+        if (sectionKey === "npm" && isMap(sectionPair.value)) {
+          const npmMap = sectionPair.value as YAMLMap;
+          sortMapByOrder(npmMap, ["version", "packages"]);
+
+          const pkgs = npmMap.get("packages", true);
+          if (isSeq(pkgs)) {
+            sortSeqAlphabetically(pkgs);
+          }
         }
       }
     }
