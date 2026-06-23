@@ -50,12 +50,13 @@ const displayItems = (
   items: Set<string>,
   title: string,
   prefix: string,
+  suffix = "",
 ) => {
   lines.push(`\n# ${title}\n`);
 
   if (items.size > 0) {
     for (const i of [...items].sort()) {
-      lines.push(`${prefix} "${i}"`);
+      lines.push(`${prefix} "${i}"${suffix}`);
     }
   } else {
     lines.push("# None.");
@@ -126,7 +127,11 @@ export async function generateBrewfile(
   lines.push(`# Machine: ${machine}`);
   lines.push(`# Last updated: ${dayjs().format("YYYY-MM-DD HH:mm:ss")}`);
 
-  displayItems(lines, taps, "Taps", "tap");
+  // Homebrew 6.0 trusts third-party taps by default
+  // (HOMEBREW_REQUIRE_TAP_TRUST), so `brew bundle install` refuses to load from
+  // any untrusted tap. A tap in hops.yml is one the user chose to install from,
+  // so mark them all trusted to keep `hops apply` working.
+  displayItems(lines, taps, "Taps", "tap", ", trusted: true");
   displayItems(lines, formulae, "Formulae", "brew");
   displayItems(lines, casks, "Casks", "cask");
   displayItems(lines, cursor, "Cursor", "vscode");
