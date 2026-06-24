@@ -59,6 +59,16 @@ export const getConfigPath = (): string => {
   return resolve(input || `${homedir()}/hops.yml`);
 };
 
+export const getMachine = (): string => {
+  const input = process.env["HOPS_MACHINE"]?.trim();
+
+  if (!input || input === "") {
+    log.warn("HOPS_MACHINEenvironment variable not set, using default");
+  }
+
+  return resolve(input || "personal");
+};
+
 export const getLastApplyPath = (): string => {
   return resolve(`${homedir()}/.hops-last-apply`);
 };
