@@ -26,7 +26,7 @@
     "noImplicitReturns": true,
 
     // types
-    "types":["bun", "node"]
+    "types": ["bun", "node"]
   },
   "include": ["src/**/*.ts", "package.json"]
 }

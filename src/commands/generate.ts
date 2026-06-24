@@ -10,6 +10,14 @@ const action: () => Promise<Result<void, Error>> = async () => {
   intro(pc.bgGreen(pc.bold("hops")));
   log.step(pc.bold("Reading hops.yml"));
 
+  const machine = getMachine();
+  if (!machine) {
+    return err(new Error("HOPS_MACHINE environment variable is not set"));
+  }
+  if (machine === "shared") {
+    return err(new Error("Machine cannot be 'shared' as it is reserved"));
+  }
+
   const configResult = await getConfig();
   if (configResult.isErr()) {
     return err(configResult.error);
@@ -21,7 +29,7 @@ const action: () => Promise<Result<void, Error>> = async () => {
       "Docs: https://github.com/revett/hops",
       `Version: v${version}`,
       `Config: ${path}`,
-      `Machine: ${getMachine()}`,
+      `Machine: ${machine}`,
     ].join("\n"),
   );
 
@@ -52,7 +60,7 @@ const action: () => Promise<Result<void, Error>> = async () => {
     }
   }
 
-  const generate = await generateBrewfile(config, getMachine(), version, path);
+  const generate = await generateBrewfile(config, machine, version, path);
   if (generate.isErr()) {
     return err(generate.error);
   }

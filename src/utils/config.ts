@@ -59,14 +59,15 @@ export const getConfigPath = (): string => {
   return resolve(input || `${homedir()}/hops.yml`);
 };
 
-export const getMachine = (): string => {
+export const getMachine = (): string | undefined => {
+  // biome-ignore lint/complexity/useLiteralKeys: It flip flops between lint failures for both.
   const input = process.env["HOPS_MACHINE"]?.trim();
 
   if (!input || input === "") {
-    log.warn("HOPS_MACHINEenvironment variable not set, using default");
+    return undefined;
   }
 
-  return resolve(input || "personal");
+  return input;
 };
 
 export const getLastApplyPath = (): string => {
