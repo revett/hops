@@ -4,7 +4,7 @@
 
 # hops
 
-Manage [Homebrew](https://brew.sh) packages across multiple machines with a single YAML file.
+Manage [Homebrew](https://brew.sh) packages and global npm packages across multiple machines with a single YAML file.
 
 ![hops-v0 3 1-demo](https://github.com/user-attachments/assets/253624a3-270a-4f17-b92f-825593b426f7)
 
@@ -17,6 +17,7 @@ Hops replaces scattered, duplicated configurations with a single declarative YAM
 - 📦 Generates a specific `Brewfile` for each machine
 - 🧹 Prune unused floating packages
 - ⚡ Installs, upgrades, and verifies with one command
+- 🌐 Manages global npm packages with Node version gating
 - 💻 Designed for dotfiles
 
 ```yaml
@@ -42,6 +43,10 @@ machines:
     cursor:
       - dbaeumer.vscode-eslint
       - github.github-vscode-theme
+    npm:
+      version: "24"
+      packages:
+        - diffity
 ```
 
 ## Install
@@ -141,6 +146,13 @@ See [hops.yml](https://github.com/revett/dotfiles/blob/main/hops.yml) in
 [revett/dotfiles](https://github.com/revett/dotfiles).
 
 ## FAQ
+
+**Does it support npm global packages?**
+
+Yes, add an `npm` section to any machine profile with a required `version` (Node major version) and
+`packages` list. Hops checks that `node` is on your PATH and matches the expected major version
+before installing. Hops is agnostic about how Node is installed (fnm, nvm, volta, bare install);
+it only verifies the version.
 
 **Does it support Cursor extensions?**
 

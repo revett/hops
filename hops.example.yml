@@ -27,3 +27,8 @@ machines:
     cursor:
       - dbaeumer.vscode-eslint
       - github.github-vscode-theme
+    npm:
+      version: "24"
+      packages:
+        - "@doist/todoist-cli"
+        - diffity

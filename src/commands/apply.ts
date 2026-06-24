@@ -4,6 +4,7 @@ import pc from "picocolors";
 import { findDuplicates, generateBrewfile } from "../services/brewfile";
 import { formatConfig } from "../services/format";
 import * as homebrew from "../services/homebrew";
+import { preflightNpm, syncNpmPackages } from "../services/npm";
 import type { Command } from "../types/command";
 import {
   getConfig,
@@ -85,6 +86,12 @@ const action: (options: ApplyOptions) => Promise<Result<void, Error>> = async (
     }
   }
 
+  // Preflight npm: check Node version early so we fail before Homebrew work
+  const npmPreflight = await preflightNpm(config, options.machine);
+  if (npmPreflight.isErr()) {
+    return err(npmPreflight.error);
+  }
+
   const generate = await generateBrewfile(
     config,
     options.machine,
@@ -158,6 +165,12 @@ const action: (options: ApplyOptions) => Promise<Result<void, Error>> = async (
   const allInstalled = await homebrew.check(config.brewfile);
   if (allInstalled.isErr()) {
     return err(allInstalled.error);
+  }
+
+  // Sync npm global packages (only runs if npm section exists in config)
+  const npmResult = await syncNpmPackages(config, options.machine);
+  if (npmResult.isErr()) {
+    return err(npmResult.error);
   }
 
   // Update last run time for reminder feature
