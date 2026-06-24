@@ -2,6 +2,7 @@ import { execa } from "execa";
 import { err, ok, type Result } from "neverthrow";
 import pc from "picocolors";
 import { capture, log, output } from "../utils/logger";
+import { getPackageVersions } from "../utils/package-versions";
 
 export function createEnv(brewfilePath: string): Record<string, string> {
   return {
@@ -64,7 +65,16 @@ export async function listFormulae(
     log.info(`${prefix} None`);
     return ok(undefined);
   }
-  log.info(lines.map((l) => `${prefix} ${l}`).join("\n"));
+
+  const versionMap = await getPackageVersions(lines, "formula");
+  log.info(
+    lines
+      .map((l) => {
+        const version = versionMap.get(l);
+        return version ? `${prefix} ${l} (${version})` : `${prefix} ${l}`;
+      })
+      .join("\n"),
+  );
 
   return ok(undefined);
 }
@@ -94,7 +104,16 @@ export async function listCasks(
     log.info(`${prefix} None`);
     return ok(undefined);
   }
-  log.info(lines.map((l) => `${prefix} ${l}`).join("\n"));
+
+  const versionMap = await getPackageVersions(lines, "cask");
+  log.info(
+    lines
+      .map((l) => {
+        const version = versionMap.get(l);
+        return version ? `${prefix} ${l} (${version})` : `${prefix} ${l}`;
+      })
+      .join("\n"),
+  );
 
   return ok(undefined);
 }
