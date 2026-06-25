@@ -164,6 +164,21 @@ Yes, as part of the [v4.5.0](https://brew.sh/2025/04/29/homebrew-4.5.0/) release
 April 2025, the `brew bundle` command looks for VS Code variants, see
 [#19545](https://github.com/Homebrew/brew/pull/19545).
 
+**What does the cleanup step actually remove?**
+
+When you confirm "Uninstall these packages?" during `apply`, hops runs three Homebrew commands in
+sequence:
+
+1. `brew bundle --force cleanup` → uninstalls formulae and casks that are installed but absent from
+   the generated Brewfile
+1. `brew autoremove` → removes orphaned dependencies (e.g. an old `python@x.y` left behind when a
+   formula bumped its Python version)
+1. `brew cleanup` → purges stale download caches and old formula/cask versions
+
+The last two were added in v0.8.1. Before that, only step 1 ran, so the orphaned dependencies and
+stale caches it could not touch reappeared in the list on every single run. `brew cleanup` runs
+without `--scrub`, so recent caches are kept and not re-downloaded on the next install.
+
 ## Project
 
 ### Releases

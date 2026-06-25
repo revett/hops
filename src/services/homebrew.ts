@@ -160,6 +160,52 @@ export async function forceCleanup(
   return ok(undefined);
 }
 
+// Removes unused dependencies left behind when a formula stops depending on
+// them (e.g. awscli bumping its Python version orphans the old python@x.y).
+// `brew bundle --force cleanup` does not do this, so we run it explicitly.
+export async function autoremove(): Promise<Result<void, Error>> {
+  const result = await execa({
+    reject: false,
+    stdin: "inherit",
+    stdout: ["inherit", "pipe"],
+  })`brew autoremove`;
+
+  capture(result.stdout);
+
+  if (result.exitCode !== 0) {
+    return err(
+      new Error(
+        `Homebrew command failed with exit code ${result.exitCode}: brew autoremove`,
+      ),
+    );
+  }
+
+  return ok(undefined);
+}
+
+// Purges stale download caches and old formula/cask versions. `brew cleanup`
+// acts by default (unlike `brew bundle cleanup`, which needs --force), so no
+// flag is needed. We deliberately omit --scrub so recent caches survive.
+export async function cleanup(): Promise<Result<void, Error>> {
+  const result = await execa({
+    reject: false,
+    stdin: "inherit",
+    stdout: ["inherit", "pipe"],
+  })`brew cleanup`;
+
+  capture(result.stdout);
+
+  if (result.exitCode !== 0) {
+    return err(
+      new Error(
+        `Homebrew command failed with exit code ${result.exitCode}: brew cleanup`,
+      ),
+    );
+  }
+
+  return ok(undefined);
+}
+
 export async function install(
   brewfilePath: string,
 ): Promise<Result<void, Error>> {

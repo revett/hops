@@ -137,7 +137,20 @@ const action: (options: ApplyOptions) => Promise<Result<void, Error>> = async (
 
     log.step(pc.bold("Removing packages"));
     console.log(pc.gray("│"));
-    const cleanup = await homebrew.forceCleanup(config.brewfile);
+    const bundleCleanup = await homebrew.forceCleanup(config.brewfile);
+    if (bundleCleanup.isErr()) {
+      return err(bundleCleanup.error);
+    }
+
+    // `brew bundle --force cleanup` only uninstalls formulae/casks absent from
+    // the Brewfile; it leaves orphaned dependencies and stale caches behind,
+    // which is why the same list resurfaced on every apply. Clear them too.
+    const autoremove = await homebrew.autoremove();
+    if (autoremove.isErr()) {
+      return err(autoremove.error);
+    }
+
+    const cleanup = await homebrew.cleanup();
     if (cleanup.isErr()) {
       return err(cleanup.error);
     }
