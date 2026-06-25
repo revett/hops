@@ -169,11 +169,11 @@ April 2025, the `brew bundle` command looks for VS Code variants, see
 When you confirm "Uninstall these packages?" during `apply`, hops runs three Homebrew commands in
 sequence:
 
-1. `brew bundle --force cleanup` → uninstalls formulae and casks that are installed but absent from
+1. `brew bundle --force cleanup` → Uninstalls formulae and casks that are installed but absent from
    the generated Brewfile
-1. `brew autoremove` → removes orphaned dependencies (e.g. an old `python@x.y` left behind when a
+1. `brew autoremove` → Removes orphaned dependencies (e.g. an old `python@x.y` left behind when a
    formula bumped its Python version)
-1. `brew cleanup` → purges stale download caches and old formula/cask versions
+1. `brew cleanup` → Purges stale download caches and old formula/cask versions
 
 The last two were added in v0.8.1. Before that, only step 1 ran, so the orphaned dependencies and
 stale caches it could not touch reappeared in the list on every single run. `brew cleanup` runs
