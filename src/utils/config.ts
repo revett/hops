@@ -2,10 +2,10 @@ import { constants } from "node:fs";
 import { access, readFile, writeFile } from "node:fs/promises";
 import { homedir } from "node:os";
 import { resolve } from "node:path";
-import { log } from "@clack/prompts";
 import { err, ok, type Result } from "neverthrow";
 import YAML from "yaml";
 import type { Config } from "../types/config";
+import * as logger from "./logger";
 import { version } from "./version";
 
 type ConfigResult = {
@@ -39,6 +39,8 @@ export const getConfig = async (): Promise<Result<ConfigResult, Error>> => {
     return err(new Error("Invalid config format: 'machines' is not defined"));
   }
 
+  logger.configure(config.logging !== false);
+
   const result: ConfigResult = {
     config: config,
     path: path,
@@ -53,7 +55,7 @@ export const getConfigPath = (): string => {
   const input = process.env["HOPS_CONFIG"]?.trim();
 
   if (!input || input === "") {
-    log.warn("HOPS_CONFIG environment variable not set, using default");
+    logger.log.warn("HOPS_CONFIG environment variable not set, using default");
   }
 
   return resolve(input || `${homedir()}/hops.yml`);

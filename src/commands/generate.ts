@@ -1,10 +1,11 @@
-import { confirm, intro, isCancel, log, outro } from "@clack/prompts";
+import { confirm, isCancel } from "@clack/prompts";
 import { err, ok, type Result } from "neverthrow";
 import pc from "picocolors";
 import { findDuplicates, generateBrewfile } from "../services/brewfile";
 import { formatConfig } from "../services/format";
 import type { Command } from "../types/command";
 import { getConfig, getMachine } from "../utils/config";
+import { intro, log, outro, status } from "../utils/logger";
 
 const action: () => Promise<Result<void, Error>> = async () => {
   intro(pc.bgGreen(pc.bold("hops")));
@@ -12,10 +13,10 @@ const action: () => Promise<Result<void, Error>> = async () => {
 
   const machine = getMachine();
   if (!machine) {
-    return err(new Error("HOPS_MACHINE environment variable is not set"));
+    return err(new Error("Machine flag is required"));
   }
   if (machine === "shared") {
-    return err(new Error("Machine cannot be 'shared' as it is reserved"));
+    return err(new Error("Machine flag not allowed: shared"));
   }
 
   const configResult = await getConfig();
@@ -29,6 +30,7 @@ const action: () => Promise<Result<void, Error>> = async () => {
       "Docs: https://github.com/revett/hops",
       `Version: v${version}`,
       `Config: ${path}`,
+      `Logging: ${status()}`,
       `Machine: ${machine}`,
     ].join("\n"),
   );

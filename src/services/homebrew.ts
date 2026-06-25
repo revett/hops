@@ -1,6 +1,6 @@
-import { log } from "@clack/prompts";
 import { execa } from "execa";
 import { err, ok, type Result } from "neverthrow";
+import { capture, log, output } from "../utils/logger";
 
 export function createEnv(brewfilePath: string): Record<string, string> {
   return {
@@ -20,7 +20,7 @@ export async function listTaps(
   })`brew bundle list --taps`;
 
   if (result.exitCode !== 0) {
-    console.log(result.message);
+    output(result.message);
     return err(
       new Error(
         `Homebrew command failed with exit code ${result.exitCode}: brew bundle list --taps`,
@@ -50,7 +50,7 @@ export async function listFormulae(
   })`brew bundle list --brews`;
 
   if (result.exitCode !== 0) {
-    console.log(result.message);
+    output(result.message);
     return err(
       new Error(
         `Homebrew command failed with exit code ${result.exitCode}: brew bundle list --brews`,
@@ -80,7 +80,7 @@ export async function listCasks(
   })`brew bundle list --casks`;
 
   if (result.exitCode !== 0) {
-    console.log(result.message);
+    output(result.message);
     return err(
       new Error(
         `Homebrew command failed with exit code ${result.exitCode}: brew bundle list --casks`,
@@ -144,11 +144,12 @@ export async function forceCleanup(
     env: createEnv(brewfilePath),
     reject: false,
     stdin: "inherit",
-    stdout: "inherit",
+    stdout: ["inherit", "pipe"],
   })`brew bundle --force cleanup`;
 
+  capture(result.stdout);
+
   if (result.exitCode !== 0) {
-    console.log(result.message);
     return err(
       new Error(
         `Homebrew command failed with exit code ${result.exitCode}: brew bundle --force cleanup`,
@@ -166,11 +167,12 @@ export async function install(
     env: createEnv(brewfilePath),
     reject: false,
     stdin: "inherit",
-    stdout: "inherit",
+    stdout: ["inherit", "pipe"],
   })`brew bundle install`;
 
+  capture(result.stdout);
+
   if (result.exitCode !== 0) {
-    console.log(result.message);
     return err(
       new Error(
         `Homebrew command failed with exit code ${result.exitCode}: brew bundle install`,
@@ -192,7 +194,7 @@ export async function check(
   })`brew bundle check`;
 
   if (result.exitCode !== 0) {
-    console.log(result.message);
+    output(result.message);
     return err(
       new Error(
         `Homebrew command failed with exit code ${result.exitCode}: brew bundle check`,
