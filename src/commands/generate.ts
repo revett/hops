@@ -13,10 +13,10 @@ const action: () => Promise<Result<void, Error>> = async () => {
 
   const machine = getMachine();
   if (!machine) {
-    return err(new Error("Machine flag is required"));
+    return err(new Error("HOPS_MACHINE environment variable is not set"));
   }
   if (machine === "shared") {
-    return err(new Error("Machine flag not allowed: shared"));
+    return err(new Error("Machine cannot be 'shared' as it is reserved"));
   }
 
   const configResult = await getConfig();
