@@ -1,4 +1,4 @@
-import { confirm, intro, isCancel, log } from "@clack/prompts";
+import { confirm, isCancel } from "@clack/prompts";
 import { err, ok, type Result } from "neverthrow";
 import pc from "picocolors";
 import { findDuplicates, generateBrewfile } from "../services/brewfile";
@@ -11,6 +11,7 @@ import {
   getLastApplyTime,
   setLastApplyTime,
 } from "../utils/config";
+import { intro, log, status } from "../utils/logger";
 
 type ApplyOptions = {
   machine?: string;
@@ -53,6 +54,7 @@ const action: (options: ApplyOptions) => Promise<Result<void, Error>> = async (
       "Docs: https://github.com/revett/hops",
       `Version: v${version}`,
       `Config: ${path}`,
+      `Logging: ${status()}`,
       `Machine: ${options.machine}`,
       `Last apply: ${lastApply}`,
     ].join("\n"),

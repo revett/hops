@@ -1,10 +1,11 @@
-import { confirm, intro, isCancel, log, outro } from "@clack/prompts";
+import { confirm, isCancel } from "@clack/prompts";
 import { err, ok, type Result } from "neverthrow";
 import pc from "picocolors";
 import { findDuplicates, generateBrewfile } from "../services/brewfile";
 import { formatConfig } from "../services/format";
 import type { Command } from "../types/command";
 import { getConfig } from "../utils/config";
+import { intro, log, outro, status } from "../utils/logger";
 
 type GenerateOptions = {
   machine?: string;
@@ -33,6 +34,7 @@ const action: (options: GenerateOptions) => Promise<Result<void, Error>> =
         "Docs: https://github.com/revett/hops",
         `Version: v${version}`,
         `Config: ${path}`,
+        `Logging: ${status()}`,
         `Machine: ${options.machine}`,
       ].join("\n"),
     );

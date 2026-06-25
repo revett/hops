@@ -2,6 +2,7 @@ import { err, ok, type Result } from "neverthrow";
 import pc from "picocolors";
 import type { Command } from "../types/command";
 import { getConfig, getLastApplyTime } from "../utils/config";
+import { output } from "../utils/logger";
 
 const defaultReminder = 7; // Defaults to reminding when over 7 days
 
@@ -30,7 +31,7 @@ const action: () => Promise<Result<void, Error>> = async () => {
   const timeSinceLastApply = Date.now() - lastApply.getTime();
   if (timeSinceLastApply >= reminderMs) {
     const daysSince = Math.floor(timeSinceLastApply / (24 * 60 * 60 * 1000));
-    console.log(
+    output(
       pc.yellow(
         `🍺 hops → ${daysSince} day${daysSince === 1 ? "" : "s"} since last apply`,
       ),
