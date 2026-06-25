@@ -9,25 +9,21 @@ import {
   getConfig,
   getLastApplyPath,
   getLastApplyTime,
+  getMachine,
   setLastApplyTime,
 } from "../utils/config";
 import { intro, log, status } from "../utils/logger";
 
-type ApplyOptions = {
-  machine?: string;
-};
-
-const action: (options: ApplyOptions) => Promise<Result<void, Error>> = async (
-  options,
-) => {
+const action: () => Promise<Result<void, Error>> = async () => {
   intro(pc.bgGreen(pc.bold("hops")));
   log.step(pc.bold("Reading hops.yml"));
 
-  if (!options.machine) {
-    return err(new Error("Machine flag is required"));
+  const machine = getMachine();
+  if (!machine) {
+    return err(new Error("HOPS_MACHINE environment variable is not set"));
   }
-  if (options.machine === "shared") {
-    return err(new Error("Machine flag not allowed: shared"));
+  if (machine === "shared") {
+    return err(new Error("Machine cannot be 'shared' as it is reserved"));
   }
 
   const configResult = await getConfig();
@@ -55,7 +51,7 @@ const action: (options: ApplyOptions) => Promise<Result<void, Error>> = async (
       `Version: v${version}`,
       `Config: ${path}`,
       `Logging: ${status()}`,
-      `Machine: ${options.machine}`,
+      `Machine: ${machine}`,
       `Last apply: ${lastApply}`,
     ].join("\n"),
   );
@@ -87,12 +83,7 @@ const action: (options: ApplyOptions) => Promise<Result<void, Error>> = async (
     }
   }
 
-  const generate = await generateBrewfile(
-    config,
-    options.machine,
-    version,
-    path,
-  );
+  const generate = await generateBrewfile(config, machine, version, path);
   if (generate.isErr()) {
     return err(generate.error);
   }
@@ -176,11 +167,5 @@ const action: (options: ApplyOptions) => Promise<Result<void, Error>> = async (
 export const apply = {
   name: "apply",
   description: "Install, update, and cleanup Homebrew packages",
-  options: [
-    {
-      flags: "--machine <machine>",
-      description: "Which machine to generate the Brewfile for",
-    },
-  ],
   action,
-} satisfies Command<ApplyOptions>;
+} satisfies Command;
