@@ -1,9 +1,9 @@
 import { writeFile } from "node:fs/promises";
-import { log } from "@clack/prompts";
 import dayjs from "dayjs";
 import { err, ok, type Result } from "neverthrow";
 import pc from "picocolors";
 import type { Config, Machine } from "../types/config";
+import { log } from "../utils/logger";
 
 type CategoryName = "taps" | "formulae" | "casks" | "cursor";
 

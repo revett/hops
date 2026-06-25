@@ -9,4 +9,5 @@ export type Config = {
   readonly brewfile: string;
   readonly machines: Record<string, Machine>;
   readonly reminder?: number;
+  readonly logging?: boolean;
 };

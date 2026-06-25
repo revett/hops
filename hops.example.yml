@@ -1,4 +1,5 @@
 brewfile: ./Brewfile.example
+logging: true
 reminder: 14
 machines:
   shared:

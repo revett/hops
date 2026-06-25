@@ -16,9 +16,12 @@
 ## Conventions
 
 - `neverthrow` Result types for all fallible operations
-- `@clack/prompts` for all user-facing output
+- `@clack/prompts` for all user-facing output, imported via `src/utils/logger.ts` (not directly) so
+  output is mirrored to the run log
 - `picocolors` for text styling
 - `shared` is a reserved machine name, merged with the target machine during generation
+- Run logging writes a colour-stripped transcript of each run to `~/.hops.log` (on by default,
+  `logging: false` in `hops.yml` disables it); a logging failure must never abort a command
 
 ## Workflow
 

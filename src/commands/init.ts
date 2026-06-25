@@ -1,6 +1,5 @@
 import { writeFile } from "node:fs/promises";
 import { homedir } from "node:os";
-import { intro, log } from "@clack/prompts";
 import { err, ok, type Result } from "neverthrow";
 import pc from "picocolors";
 import YAML from "yaml";
@@ -8,10 +7,12 @@ import type { Command } from "../types/command";
 import type { Config } from "../types/config";
 import { getConfigPath } from "../utils/config";
 import { fileExists } from "../utils/file";
+import { intro, log } from "../utils/logger";
 
 // Default config with a few example packages to illustrate the structure
 const defaultConfig: Config = {
   brewfile: `${homedir()}/Brewfile`,
+  logging: true,
   machines: {
     shared: {
       taps: ["homebrew/bundle"],

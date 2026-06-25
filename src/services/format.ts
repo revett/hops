@@ -2,7 +2,7 @@ import { readFile, writeFile } from "node:fs/promises";
 import { err, ok, type Result } from "neverthrow";
 import YAML, { isMap, isScalar, isSeq, type YAMLMap, type YAMLSeq } from "yaml";
 
-const TOP_LEVEL_ORDER = ["brewfile", "reminder", "machines"];
+const TOP_LEVEL_ORDER = ["brewfile", "logging", "reminder", "machines"];
 const MACHINE_SECTION_ORDER = ["taps", "formulae", "casks", "cursor"];
 
 /**
