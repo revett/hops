@@ -22,6 +22,10 @@
 - `shared` is a reserved machine name, merged with the target machine during generation
 - Run logging writes a colour-stripped transcript of each run to `~/.hops.log` (on by default,
   `logging: false` in `hops.yml` disables it); a logging failure must never abort a command
+- `apply` cleanup runs three brew commands in order: `brew bundle --force cleanup` (uninstall
+  non-Brewfile packages), `brew autoremove` (orphaned deps), `brew cleanup` (stale caches/old
+  versions). The latter two are required because `brew bundle cleanup` previews `brew cleanup`'s work
+  but never executes it, so omitting them left the same removal list resurfacing on every run
 
 ## Workflow
 
