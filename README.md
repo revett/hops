@@ -135,6 +135,22 @@ hops format
 hops reminder
 ```
 
+## Logging
+
+Every run writes a plain text transcript to `~/.hops.log` to help with debugging. It captures
+everything: the command output, any errors, and the full live `brew bundle` stream during `apply`.
+
+- Enabled by default
+- Colour codes are stripped, so the file is clean plain text
+- Overwritten on each run, so it only ever holds your most recent run
+- A logging failure never stops a command from running
+
+Disable it via `hops.yml`:
+
+```yaml
+logging: false
+```
+
 ## Examples
 
 See [hops.yml](https://github.com/revett/dotfiles/blob/main/hops.yml) in
