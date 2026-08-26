@@ -42,6 +42,8 @@ machines:
     cursor:
       - dbaeumer.vscode-eslint
       - github.github-vscode-theme
+    ignore:
+      - google-chrome
 ```
 
 ## Install
@@ -115,6 +117,7 @@ Hops will take care of:
 - Install any missing packages
 - Update any outdated packages
 - Remove any floating packages that are not outlined in the `Brewfile`
+- Leave `ignore` packages alone, even if installed via Homebrew
 
 ## Commands
 
@@ -163,6 +166,11 @@ See [hops.yml](https://github.com/revett/dotfiles/blob/main/hops.yml) in
 Yes, as part of the [v4.5.0](https://brew.sh/2025/04/29/homebrew-4.5.0/) release of Homebrew on 29th
 April 2025, the `brew bundle` command looks for VS Code variants, see
 [#19545](https://github.com/Homebrew/brew/pull/19545).
+
+**How do I stop hops touching a package managed by something else (e.g. an MDM)?**
+
+Add it to `ignore` under `shared` or the machine. Hops will not install, upgrade, or uninstall it,
+and it is hidden from the floating package check.
 
 ## Project
 

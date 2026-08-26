@@ -3,7 +3,7 @@ import { err, ok, type Result } from "neverthrow";
 import YAML, { isMap, isScalar, isSeq, type YAMLMap, type YAMLSeq } from "yaml";
 
 const TOP_LEVEL_ORDER = ["brewfile", "logging", "reminder", "machines"];
-const MACHINE_SECTION_ORDER = ["taps", "formulae", "casks", "cursor"];
+const MACHINE_SECTION_ORDER = ["taps", "formulae", "casks", "cursor", "ignore"];
 
 /**
  * Sort a YAMLMap's items by a predefined key order. Keys not in the order list

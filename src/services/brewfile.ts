@@ -5,9 +5,20 @@ import pc from "picocolors";
 import type { Config, Machine } from "../types/config";
 import { log } from "../utils/logger";
 
-type CategoryName = "taps" | "formulae" | "casks" | "cursor";
+type CategoryName = "taps" | "formulae" | "casks" | "cursor" | "ignore";
 
-const categories: CategoryName[] = ["taps", "formulae", "casks", "cursor"];
+const categories: CategoryName[] = [
+  "taps",
+  "formulae",
+  "casks",
+  "cursor",
+  "ignore",
+];
+
+export type Generated = {
+  // Packages to leave alone during apply, merged from shared and the machine
+  readonly ignore: readonly string[];
+};
 
 export const findDuplicates = (machines: Record<string, Machine>): string[] => {
   const found = new Set<string>();
@@ -70,7 +81,7 @@ export async function generateBrewfile(
   machine: string,
   version: string,
   path: string,
-): Promise<Result<void, Error>> {
+): Promise<Result<Generated, Error>> {
   log.step(pc.bold("Generating Brewfile"));
   const { brewfile, machines } = config;
 
@@ -82,6 +93,7 @@ export async function generateBrewfile(
   const formulae = new Set<string>();
   const casks = new Set<string>();
   const cursor = new Set<string>();
+  const ignore = new Set<string>();
 
   for (const [mach, packages] of Object.entries(machines)) {
     if (mach !== machine && mach !== "shared") {
@@ -100,10 +112,23 @@ export async function generateBrewfile(
     for (const c of packages.cursor ?? []) {
       cursor.add(c);
     }
+    for (const i of packages.ignore ?? []) {
+      ignore.add(i);
+    }
   }
 
-  const hasCursorInstalled = casks.has("cursor");
-  if (!hasCursorInstalled && cursor.size > 0) {
+  // A package cannot be both managed by hops and ignored by it
+  for (const i of ignore) {
+    if (taps.has(i) || formulae.has(i) || casks.has(i) || cursor.has(i)) {
+      return err(
+        new Error(`Package is both listed and ignored in hops.yml: ${i}`),
+      );
+    }
+  }
+
+  // Cursor may be installed by hops, or by something else and ignored
+  const hasCursor = casks.has("cursor") || ignore.has("cursor");
+  if (!hasCursor && cursor.size > 0) {
     return err(
       new Error(
         "Cursor extensions defined in hops.yml but Cursor cask not installed",
@@ -117,6 +142,7 @@ export async function generateBrewfile(
       `${formulae.size} ${formulae.size === 1 ? "formula" : "formulae"}`,
       `${casks.size} ${casks.size === 1 ? "cask" : "casks"}`,
       `${cursor.size} ${cursor.size === 1 ? "cursor extension" : "cursor extensions"}`,
+      `${ignore.size} ignored`,
     ].join("\n"),
   );
 
@@ -144,5 +170,5 @@ export async function generateBrewfile(
   }
 
   log.success(`Wrote ${lines.length} lines to: ${brewfile}`);
-  return ok(undefined);
+  return ok({ ignore: [...ignore].sort() });
 }
