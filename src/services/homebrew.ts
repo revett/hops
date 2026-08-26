@@ -110,31 +110,59 @@ export async function listFloatingPackages(
     stdin: "inherit",
   })`brew bundle cleanup`;
 
-  // List of known log lines that we want to filter out, as not relevant
-  const blockListLinePrefixes = [
-    "Would uninstall ",
-    "Would `brew cleanup`:",
-    "Run `brew bundle cleanup",
-  ];
+  // The dry run output is a series of sections, each introduced by a "Would ..."
+  // header followed by one entry per line. The final section, "Would `brew
+  // cleanup`:", lists cache files rather than packages, so everything from
+  // that header onwards is ignored here; the cache is removed separately by
+  // `cleanupCache` on every run.
+  const cacheHeaderIndex = result.stdout.findIndex((l) =>
+    l.startsWith("Would `brew cleanup`:"),
+  );
+  const packageLines =
+    cacheHeaderIndex === -1
+      ? result.stdout
+      : result.stdout.slice(0, cacheHeaderIndex);
 
-  const lines = result.stdout.filter((l) => {
-    return !blockListLinePrefixes.some((prefix) => l.startsWith(prefix));
-  });
+  const packages = packageLines.filter(
+    (l) =>
+      l.trim() !== "" &&
+      !l.startsWith("Would ") &&
+      !l.startsWith("Run `brew bundle cleanup"),
+  );
 
-  // Remove "Would remove: " prefix from lines that start with it
-  const processedLines = lines.map((l) => {
-    if (l.startsWith("Would remove: ")) {
-      return l.substring("Would remove: ".length);
-    }
-    return l;
-  });
-
-  if (processedLines.length > 0) {
-    log.info(processedLines.map((l) => `${prefix} ${l}`).join("\n"));
+  if (packages.length > 0) {
+    log.info(packages.map((l) => `${prefix} ${l}`).join("\n"));
     return ok(false);
   }
 
   return ok(true);
+}
+
+// Purges old formula/cask versions and stale downloads. Deliberately runs
+// without --scrub so recent downloads survive and aren't fetched again next run.
+export async function cleanupCache(): Promise<Result<void, Error>> {
+  const result = await execa({
+    lines: true,
+    reject: false,
+    stdin: "inherit",
+  })`brew cleanup`;
+
+  if (result.exitCode !== 0) {
+    output(result.message);
+    return err(
+      new Error(
+        `Homebrew command failed with exit code ${result.exitCode}: brew cleanup`,
+      ),
+    );
+  }
+
+  // Output is empty when there was nothing to remove
+  const lines = result.stdout.filter(Boolean);
+  if (lines.length > 0) {
+    log.info(lines.join("\n"));
+  }
+
+  return ok(undefined);
 }
 
 export async function forceCleanup(

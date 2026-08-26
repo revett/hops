@@ -162,6 +162,14 @@ const action: (options: ApplyOptions) => Promise<Result<void, Error>> = async (
     return err(allInstalled.error);
   }
 
+  // Remove cached downloads and old versions, runs after install/upgrade so old versions are gone too
+  log.step(pc.bold("Removing cache"));
+  const cache = await homebrew.cleanupCache();
+  if (cache.isErr()) {
+    return err(cache.error);
+  }
+  log.success("Cache clean");
+
   // Update last run time for reminder feature
   log.success(`Updating timestamp: ${getLastApplyPath()}`);
   const setLastApply = await setLastApplyTime();
