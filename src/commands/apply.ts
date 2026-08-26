@@ -118,11 +118,17 @@ const action: (options: ApplyOptions) => Promise<Result<void, Error>> = async (
 
   // Cleanup packages not in Brewfile
   log.step(pc.bold("Checking for packages not in Brewfile"));
-  const floating = await homebrew.listFloatingPackages(config.brewfile, "-");
+  const floating = await homebrew.listFloatingPackages(
+    config.brewfile,
+    generate.value.ignore,
+    "-",
+  );
   if (floating.isErr()) {
     return err(floating.error);
   }
-  if (!floating.value) {
+  if (floating.value === null) {
+    log.info("No packages to uninstall");
+  } else {
     log.warn(
       "Check if any of the above packages need to be added to your hops.yml",
     );
@@ -136,15 +142,13 @@ const action: (options: ApplyOptions) => Promise<Result<void, Error>> = async (
     }
 
     log.step(pc.bold("Removing packages"));
-    console.log(pc.gray("│"));
-    const cleanup = await homebrew.forceCleanup(config.brewfile);
-    if (cleanup.isErr()) {
-      return err(cleanup.error);
+    console.log(pc.gray("│")); // Unable to use clack/prompts logging here as streaming so need pipe
+    const removed = await homebrew.uninstall(floating.value);
+    if (removed.isErr()) {
+      return err(removed.error);
     }
 
-    log.success("Cleanup complete");
-  } else {
-    log.info("No packages to uninstall");
+    log.success("Packages removed");
   }
 
   // Install and upgrade packages

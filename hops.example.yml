@@ -28,3 +28,5 @@ machines:
     cursor:
       - dbaeumer.vscode-eslint
       - github.github-vscode-theme
+    ignore:
+      - google-chrome # Managed by MDM, hops leaves it alone

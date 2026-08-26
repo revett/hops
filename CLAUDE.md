@@ -20,6 +20,10 @@
   output is mirrored to the run log
 - `picocolors` for text styling
 - `shared` is a reserved machine name, merged with the target machine during generation
+- `ignore` lists packages managed outside hops; they are excluded from the Brewfile and filtered
+  out of the floating package check, and a package cannot be both listed and ignored
+- Floating packages are uninstalled by hops itself (`brew uninstall`, `brew untap`, `cursor
+  --uninstall-extension`), not `brew bundle --force cleanup`, which would also remove ignored ones
 - Run logging writes a colour-stripped transcript of each run to `~/.hops.log` (on by default,
   `logging: false` in `hops.yml` disables it); a logging failure must never abort a command
 
