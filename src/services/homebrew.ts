@@ -138,6 +138,8 @@ export async function listFloatingPackages(
   return ok(true);
 }
 
+// Purges old formula/cask versions and stale downloads. Deliberately runs
+// without --scrub so recent downloads survive and aren't fetched again next run.
 export async function cleanupCache(): Promise<Result<void, Error>> {
   const result = await execa({
     lines: true,
