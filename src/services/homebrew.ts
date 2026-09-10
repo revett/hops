@@ -2,7 +2,6 @@ import { execa } from "execa";
 import { err, ok, type Result } from "neverthrow";
 import pc from "picocolors";
 import { capture, log, output } from "../utils/logger";
-import { getPackageVersions } from "../utils/package-versions";
 
 export function createEnv(brewfilePath: string): Record<string, string> {
   return {
@@ -10,112 +9,121 @@ export function createEnv(brewfilePath: string): Record<string, string> {
   };
 }
 
-export async function listTaps(
-  brewfilePath: string,
-  prefix: string,
-): Promise<Result<void, Error>> {
-  const result = await execa({
-    env: createEnv(brewfilePath),
+type BundleKind = "brews" | "casks" | "taps";
+
+// `brew list` prints unqualified names, while a Brewfile can name a package by
+// its full tap path, so both sides are keyed on the last path segment.
+function shortName(name: string): string {
+  return name.split("/").pop() ?? name;
+}
+
+// Versions of everything currently installed, keyed by short name. Listing all
+// of them in one go avoids naming packages that are not installed yet, which
+// makes `brew list` exit non-zero.
+async function listVersions(
+  flag: "--cask" | "--formula",
+): Promise<Result<Map<string, string>, Error>> {
+  const args = ["list", flag, "--versions"];
+  const result = await execa("brew", args, {
     lines: true,
     reject: false,
     stdin: "inherit",
-  })`brew bundle list --taps`;
+  });
 
   if (result.exitCode !== 0) {
     output(result.message);
     return err(
       new Error(
-        `Homebrew command failed with exit code ${result.exitCode}: brew bundle list --taps`,
+        `Homebrew command failed with exit code ${result.exitCode}: brew ${args.join(" ")}`,
       ),
     );
   }
 
-  const lines = result.stdout.filter(Boolean);
-  if (lines.length === 0) {
+  const versions = new Map<string, string>();
+  for (const line of result.stdout.filter(Boolean)) {
+    const [name, ...rest] = line.trim().split(/\s+/);
+    if (!name || rest.length === 0) {
+      continue;
+    }
+    // Cask versions are "<version>,<build>", and the build is noise in a list
+    versions.set(shortName(name), rest.join(" ").split(",")[0] ?? "");
+  }
+
+  return ok(versions);
+}
+
+// Lists what the Brewfile asks for, not what is installed, annotated with the
+// installed version when there is one. Pass a version flag for package kinds
+// that have versions, or null for taps.
+async function listPackages(
+  brewfilePath: string,
+  prefix: string,
+  kind: BundleKind,
+  versionFlag: "--cask" | "--formula" | null,
+): Promise<Result<void, Error>> {
+  const args = ["bundle", "list", `--${kind}`];
+  const result = await execa("brew", args, {
+    env: createEnv(brewfilePath),
+    lines: true,
+    reject: false,
+    stdin: "inherit",
+  });
+
+  if (result.exitCode !== 0) {
+    output(result.message);
+    return err(
+      new Error(
+        `Homebrew command failed with exit code ${result.exitCode}: brew ${args.join(" ")}`,
+      ),
+    );
+  }
+
+  const names = result.stdout.filter(Boolean);
+  if (names.length === 0) {
     log.info(`${prefix} None`);
     return ok(undefined);
   }
-  log.info(lines.map((l) => `${prefix} ${l}`).join("\n"));
+
+  let versions = new Map<string, string>();
+  if (versionFlag !== null) {
+    const listed = await listVersions(versionFlag);
+    if (listed.isErr()) {
+      return err(listed.error);
+    }
+    versions = listed.value;
+  }
+
+  log.info(
+    names
+      .map((name) => {
+        const version = versions.get(shortName(name));
+        return version ? `${prefix} ${name} (${version})` : `${prefix} ${name}`;
+      })
+      .join("\n"),
+  );
 
   return ok(undefined);
+}
+
+export async function listTaps(
+  brewfilePath: string,
+  prefix: string,
+): Promise<Result<void, Error>> {
+  return listPackages(brewfilePath, prefix, "taps", null);
 }
 
 export async function listFormulae(
   brewfilePath: string,
   prefix: string,
 ): Promise<Result<void, Error>> {
-  const result = await execa({
-    env: createEnv(brewfilePath),
-    lines: true,
-    reject: false,
-    stdin: "inherit",
-  })`brew bundle list --brews`;
-
-  if (result.exitCode !== 0) {
-    output(result.message);
-    return err(
-      new Error(
-        `Homebrew command failed with exit code ${result.exitCode}: brew bundle list --brews`,
-      ),
-    );
-  }
-
-  const lines = result.stdout.filter(Boolean);
-  if (lines.length === 0) {
-    log.info(`${prefix} None`);
-    return ok(undefined);
-  }
-
-  const versionMap = await getPackageVersions(lines, "formula");
-  log.info(
-    lines
-      .map((l) => {
-        const version = versionMap.get(l);
-        return version ? `${prefix} ${l} (${version})` : `${prefix} ${l}`;
-      })
-      .join("\n"),
-  );
-
-  return ok(undefined);
+  return listPackages(brewfilePath, prefix, "brews", "--formula");
 }
 
 export async function listCasks(
   brewfilePath: string,
   prefix: string,
 ): Promise<Result<void, Error>> {
-  const result = await execa({
-    env: createEnv(brewfilePath),
-    lines: true,
-    reject: false,
-    stdin: "inherit",
-  })`brew bundle list --casks`;
-
-  if (result.exitCode !== 0) {
-    output(result.message);
-    return err(
-      new Error(
-        `Homebrew command failed with exit code ${result.exitCode}: brew bundle list --casks`,
-      ),
-    );
-  }
-
-  const lines = result.stdout.filter(Boolean);
-  if (lines.length === 0) {
-    log.info(`${prefix} None`);
-    return ok(undefined);
-  }
-
-  const versionMap = await getPackageVersions(lines, "cask");
-  log.info(
-    lines
-      .map((l) => {
-        const version = versionMap.get(l);
-        return version ? `${prefix} ${l} (${version})` : `${prefix} ${l}`;
-      })
-      .join("\n"),
-  );
-
-  return ok(undefined);
+  return listPackages(brewfilePath, prefix, "casks", "--cask");
 }
 
 export type Floating = {
