@@ -24,6 +24,9 @@
   out of the floating package check, and a package cannot be both listed and ignored
 - Floating packages are uninstalled by hops itself (`brew uninstall`, `brew untap`, `cursor
   --uninstall-extension`), not `brew bundle --force cleanup`, which would also remove ignored ones
+- Formulae and casks are listed with their installed version, read from a single `brew list
+  --versions` call and matched on the short name, since `brew list` prints packages unqualified
+  while a Brewfile may name them by full tap path
 - Run logging writes a colour-stripped transcript of each run to `~/.hops.log` (on by default,
   `logging: false` in `hops.yml` disables it); a logging failure must never abort a command
 
