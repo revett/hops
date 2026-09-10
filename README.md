@@ -1,17 +1,13 @@
-<p align="center">
-  <img src="./assets/logo.png" width="250px">
-</p>
+# Hops
 
-# hops
-
-Manage [Homebrew](https://brew.sh) packages across multiple machines with a single YAML file.
+CLI to manage your [Homebrew](https://brew.sh) packages across multiple machines using a single YAML file.
 
 ![hops-v0 3 1-demo](https://github.com/user-attachments/assets/253624a3-270a-4f17-b92f-825593b426f7)
 
 ## Why?
 
-Managing Homebrew packages with `Brewfile` is great, until you're juggling multiple machines.
-Hops replaces scattered, duplicated configurations with a single declarative YAML config.
+Managing Homebrew packages with a `Brewfile` is great, until you're juggling multiple machines. Hops
+replaces scattered and duplicated configs with a single YAML declaration.
 
 - ✅ One `hops.yml` config for all machines
 - 📦 Generates a specific `Brewfile` for each machine
@@ -68,7 +64,6 @@ hops -h
 ```
 
 ### Build from Source
-
 
 ```bash
 # Clone repo locally
