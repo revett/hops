@@ -61,6 +61,17 @@ export const getConfigPath = (): string => {
   return resolve(input || `${homedir()}/hops.yml`);
 };
 
+export const getMachine = (): string | undefined => {
+  // biome-ignore lint/complexity/useLiteralKeys: It flip flops between lint failures for both.
+  const input = process.env["HOPS_MACHINE"]?.trim();
+
+  if (!input || input === "") {
+    return undefined;
+  }
+
+  return input;
+};
+
 export const getLastApplyPath = (): string => {
   return resolve(`${homedir()}/.hops-last-apply`);
 };

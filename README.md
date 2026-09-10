@@ -94,6 +94,10 @@ Optionally set the `HOPS_CONFIG` environment variable within your terminal profi
 export HOPS_CONFIG=/path/to/hops.yml
 ```
 
+```bash
+export HOPS_MACHINE=work
+```
+
 Initialise the configuration file:
 
 ```bash
@@ -107,8 +111,8 @@ machines.
 Apply the configuration for a specific machine:
 
 ```bash
-hops generate --machine work
-hops apply --machine work
+hops generate
+hops apply
 ```
 
 Hops will take care of:
@@ -126,10 +130,10 @@ Hops will take care of:
 hops init
 
 # Generate a local Brewfile for a specific machine without installing anything
-hops generate --machine work
+hops generate 
 
 # Generate Brewfile and apply changes via Homebrew commands (install, upgrade, cleanup)
-hops apply --machine personal
+hops apply 
 
 # Format hops.yml (sort packages A-Z, order sections, 2-space indent)
 hops format

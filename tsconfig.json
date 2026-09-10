@@ -23,7 +23,10 @@
     "noUnusedParameters": true,
     "noPropertyAccessFromIndexSignature": true,
     "exactOptionalPropertyTypes": true,
-    "noImplicitReturns": true
+    "noImplicitReturns": true,
+
+    // types
+    "types": ["bun", "node"]
   },
   "include": ["src/**/*.ts", "package.json"]
 }
