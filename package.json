@@ -8,7 +8,8 @@
   "private": true,
   "scripts": {
     "biome:check": "biome check .",
-    "biome:fix": "biome check --write ."
+    "biome:fix": "biome check --write .",
+    "typecheck": "tsc --noEmit"
   },
   "dependencies": {
     "@clack/prompts": "^1.8.0",
@@ -21,6 +22,7 @@
   },
   "devDependencies": {
     "@biomejs/biome": "^2.5.13",
-    "@types/bun": "^1.4.2"
+    "@types/bun": "^1.4.2",
+    "typescript": "^5.9.3"
   }
 }

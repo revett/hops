@@ -88,7 +88,12 @@ export const outro = (message: string): void => {
   write(message);
 };
 
-export const output = (message: string): void => {
+// execa only sets a message when a command fails
+export const output = (message: string | undefined): void => {
+  if (message === undefined) {
+    return;
+  }
+
   console.log(message);
   write(message);
 };

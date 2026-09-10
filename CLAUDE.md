@@ -11,7 +11,8 @@
 - Use the `Makefile` for building
 - Test locally: `make build && ./hops <command>`
 - Note that `HOPS_CONFIG=./hops.example.yml` has been set in the local Claude settings for the repo
-- Always run `bun biome:fix` after making code changes
+- Always run `bun biome:fix` and `bun typecheck` after making code changes
+- CI runs both on every pull request, via `.github/workflows/checks.yml`
 
 ## Conventions
 
