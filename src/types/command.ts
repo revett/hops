@@ -1,4 +1,4 @@
-import type { Result } from "neverthrow";
+import type { Result } from "../utils/result";
 
 export type CommandOption = {
   readonly flags: string;

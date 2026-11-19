@@ -1,8 +1,8 @@
 import { styleText } from "node:util";
-import { err, ok, type Result } from "neverthrow";
 import type { Command } from "../types/command";
 import { getConfig, getLastApplyTime } from "../utils/config";
 import { output } from "../utils/logger";
+import { err, ok, type Result } from "../utils/result";
 
 const defaultReminder = 7; // Defaults to reminding when over 7 days
 

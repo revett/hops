@@ -1,11 +1,11 @@
 import { styleText } from "node:util";
 import { confirm, isCancel } from "@clack/prompts";
-import { err, ok, type Result } from "neverthrow";
 import { findDuplicates, generateBrewfile } from "../services/brewfile";
 import { formatConfig } from "../services/format";
 import type { Command } from "../types/command";
 import { getConfig } from "../utils/config";
 import { intro, log, outro, status } from "../utils/logger";
+import { err, ok, type Result } from "../utils/result";
 
 type GenerateOptions = {
   machine?: string;
