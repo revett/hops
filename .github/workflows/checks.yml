@@ -22,3 +22,5 @@ jobs:
         run: bunx biome ci .
       - name: Run TypeScript
         run: bun run typecheck
+      - name: Run tests
+        run: bun test
