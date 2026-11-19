@@ -1,8 +1,8 @@
 import { writeFile } from "node:fs/promises";
 import { styleText } from "node:util";
-import { err, ok, type Result } from "neverthrow";
 import type { Config, Machine } from "../types/config";
 import { log } from "../utils/logger";
+import { err, ok, type Result } from "../utils/result";
 
 type CategoryName = "taps" | "formulae" | "casks" | "cursor" | "ignore";
 

@@ -1,6 +1,5 @@
 import { styleText } from "node:util";
 import { confirm, isCancel } from "@clack/prompts";
-import { err, ok, type Result } from "neverthrow";
 import { findDuplicates, generateBrewfile } from "../services/brewfile";
 import { formatConfig } from "../services/format";
 import * as homebrew from "../services/homebrew";
@@ -12,6 +11,7 @@ import {
   setLastApplyTime,
 } from "../utils/config";
 import { intro, log, status } from "../utils/logger";
+import { err, ok, type Result } from "../utils/result";
 
 type ApplyOptions = {
   machine?: string;

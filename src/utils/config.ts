@@ -2,10 +2,10 @@ import { constants } from "node:fs";
 import { access, readFile, writeFile } from "node:fs/promises";
 import { homedir } from "node:os";
 import { resolve } from "node:path";
-import { err, ok, type Result } from "neverthrow";
 import YAML from "yaml";
 import type { Config } from "../types/config";
 import * as logger from "./logger";
+import { err, ok, type Result } from "./result";
 import { version } from "./version";
 
 type ConfigResult = {

@@ -1,7 +1,7 @@
 import { styleText } from "node:util";
 import { execa } from "execa";
-import { err, ok, type Result } from "neverthrow";
 import { capture, log, output } from "../utils/logger";
+import { err, ok, type Result } from "../utils/result";
 
 export function createEnv(brewfilePath: string): Record<string, string> {
   return {

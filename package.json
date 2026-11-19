@@ -16,7 +16,6 @@
     "@clack/prompts": "^1.8.0",
     "cac": "^7.0.0",
     "execa": "^10.0.1",
-    "neverthrow": "^8.2.0",
     "yaml": "^2.9.0"
   },
   "devDependencies": {

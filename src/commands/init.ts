@@ -1,13 +1,13 @@
 import { writeFile } from "node:fs/promises";
 import { homedir } from "node:os";
 import { styleText } from "node:util";
-import { err, ok, type Result } from "neverthrow";
 import YAML from "yaml";
 import type { Command } from "../types/command";
 import type { Config } from "../types/config";
 import { getConfigPath } from "../utils/config";
 import { fileExists } from "../utils/file";
 import { intro, log } from "../utils/logger";
+import { err, ok, type Result } from "../utils/result";
 
 // Default config with a few example packages to illustrate the structure
 const defaultConfig: Config = {

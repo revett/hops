@@ -1,9 +1,9 @@
 import { styleText } from "node:util";
-import { err, ok, type Result } from "neverthrow";
 import { formatConfig } from "../services/format";
 import type { Command } from "../types/command";
 import { getConfig, getConfigPath } from "../utils/config";
 import { intro, log, outro, status } from "../utils/logger";
+import { err, ok, type Result } from "../utils/result";
 import { version } from "../utils/version";
 
 const action: () => Promise<Result<void, Error>> = async () => {

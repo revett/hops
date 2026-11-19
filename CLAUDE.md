@@ -17,7 +17,8 @@
 
 ## Conventions
 
-- `neverthrow` Result types for all fallible operations
+- `Result` types from `src/utils/result.ts` for all fallible operations (a neverthrow style `ok`,
+  `err`, `isOk()`, `isErr()` API, kept local to avoid the dependency)
 - `@clack/prompts` for all user-facing output, imported via `src/utils/logger.ts` (not directly) so
   output is mirrored to the run log
 - `styleText` from `node:util` for text styling, the same as clack uses, so colour detection matches
