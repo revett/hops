@@ -1,5 +1,5 @@
+import { styleText } from "node:util";
 import { err, ok, type Result } from "neverthrow";
-import pc from "picocolors";
 import { formatConfig } from "../services/format";
 import type { Command } from "../types/command";
 import { getConfig, getConfigPath } from "../utils/config";
@@ -7,7 +7,7 @@ import { intro, log, outro, status } from "../utils/logger";
 import { version } from "../utils/version";
 
 const action: () => Promise<Result<void, Error>> = async () => {
-  intro(pc.bgGreen(pc.bold("hops")));
+  intro(styleText(["bgGreen", "bold"], "hops"));
 
   const configResult = await getConfig();
   const path = configResult.isOk() ? configResult.value.path : getConfigPath();
@@ -21,7 +21,7 @@ const action: () => Promise<Result<void, Error>> = async () => {
     ].join("\n"),
   );
 
-  log.step(pc.bold("Formatting"));
+  log.step(styleText("bold", "Formatting"));
 
   const result = await formatConfig(path);
   if (result.isErr()) {
@@ -33,7 +33,7 @@ const action: () => Promise<Result<void, Error>> = async () => {
   } else {
     log.success("No formatting issues");
   }
-  outro(pc.bold("Done"));
+  outro(styleText("bold", "Done"));
   return ok(undefined);
 };
 

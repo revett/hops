@@ -1,6 +1,6 @@
 import { writeFile } from "node:fs/promises";
+import { styleText } from "node:util";
 import { err, ok, type Result } from "neverthrow";
-import pc from "picocolors";
 import type { Config, Machine } from "../types/config";
 import { log } from "../utils/logger";
 
@@ -88,7 +88,7 @@ export async function generateBrewfile(
   version: string,
   path: string,
 ): Promise<Result<Generated, Error>> {
-  log.step(pc.bold("Generating Brewfile"));
+  log.step(styleText("bold", "Generating Brewfile"));
   const { brewfile, machines } = config;
 
   if (!machines[machine]) {

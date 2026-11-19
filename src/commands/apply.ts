@@ -1,6 +1,6 @@
+import { styleText } from "node:util";
 import { confirm, isCancel } from "@clack/prompts";
 import { err, ok, type Result } from "neverthrow";
-import pc from "picocolors";
 import { findDuplicates, generateBrewfile } from "../services/brewfile";
 import { formatConfig } from "../services/format";
 import * as homebrew from "../services/homebrew";
@@ -20,8 +20,8 @@ type ApplyOptions = {
 const action: (options: ApplyOptions) => Promise<Result<void, Error>> = async (
   options,
 ) => {
-  intro(pc.bgGreen(pc.bold("hops")));
-  log.step(pc.bold("Reading hops.yml"));
+  intro(styleText(["bgGreen", "bold"], "hops"));
+  log.step(styleText("bold", "Reading hops.yml"));
 
   if (!options.machine) {
     return err(new Error("Machine flag is required"));
@@ -60,7 +60,7 @@ const action: (options: ApplyOptions) => Promise<Result<void, Error>> = async (
     ].join("\n"),
   );
 
-  log.step(pc.bold("Formatting"));
+  log.step(styleText("bold", "Formatting"));
   const formatResult = await formatConfig(path);
   if (formatResult.isErr()) {
     return err(formatResult.error);
@@ -74,7 +74,7 @@ const action: (options: ApplyOptions) => Promise<Result<void, Error>> = async (
 
   const duplicates = findDuplicates(config.machines);
   if (duplicates.length > 0) {
-    log.warn(pc.bold("Duplicates found in hops.yml"));
+    log.warn(styleText("bold", "Duplicates found in hops.yml"));
     log.info(duplicates.map((d) => `- ${d}`).join("\n"));
 
     const shouldContinue = await confirm({
@@ -82,7 +82,7 @@ const action: (options: ApplyOptions) => Promise<Result<void, Error>> = async (
     });
 
     if (isCancel(shouldContinue) || !shouldContinue) {
-      log.error(pc.bold("Exiting early"));
+      log.error(styleText("bold", "Exiting early"));
       process.exit(0);
     }
   }
@@ -98,26 +98,26 @@ const action: (options: ApplyOptions) => Promise<Result<void, Error>> = async (
   }
 
   // List everything that is currently installed
-  log.step(pc.bold("Installed taps"));
+  log.step(styleText("bold", "Installed taps"));
   const taps = await homebrew.listTaps(config.brewfile, "-");
   if (taps.isErr()) {
     return err(taps.error);
   }
 
-  log.step(pc.bold("Installed formulae"));
+  log.step(styleText("bold", "Installed formulae"));
   const formulae = await homebrew.listFormulae(config.brewfile, "-");
   if (formulae.isErr()) {
     return err(formulae.error);
   }
 
-  log.step(pc.bold("Installed casks"));
+  log.step(styleText("bold", "Installed casks"));
   const casks = await homebrew.listCasks(config.brewfile, "-");
   if (casks.isErr()) {
     return err(casks.error);
   }
 
   // Cleanup packages not in Brewfile
-  log.step(pc.bold("Checking for packages not in Brewfile"));
+  log.step(styleText("bold", "Checking for packages not in Brewfile"));
   const floating = await homebrew.listFloatingPackages(
     config.brewfile,
     generate.value.ignore,
@@ -141,8 +141,8 @@ const action: (options: ApplyOptions) => Promise<Result<void, Error>> = async (
       process.exit(0);
     }
 
-    log.step(pc.bold("Removing packages"));
-    console.log(pc.gray("│")); // Unable to use clack/prompts logging here as streaming so need pipe
+    log.step(styleText("bold", "Removing packages"));
+    console.log(styleText("gray", "│")); // Unable to use clack/prompts logging here as streaming so need pipe
     const removed = await homebrew.uninstall(floating.value);
     if (removed.isErr()) {
       return err(removed.error);
@@ -152,22 +152,24 @@ const action: (options: ApplyOptions) => Promise<Result<void, Error>> = async (
   }
 
   // Install and upgrade packages
-  log.step(pc.bold("Install/upgrade packages from Brewfile"));
-  console.log(pc.gray("│")); // Unable to use clack/prompts logging here as streaming so need pipe
+  log.step(styleText("bold", "Install/upgrade packages from Brewfile"));
+  console.log(styleText("gray", "│")); // Unable to use clack/prompts logging here as streaming so need pipe
   const install = await homebrew.install(config.brewfile);
   if (install.isErr()) {
     return err(install.error);
   }
 
   // Final check
-  log.step(pc.bold("Checking all packages in Brewfile are installed"));
+  log.step(
+    styleText("bold", "Checking all packages in Brewfile are installed"),
+  );
   const allInstalled = await homebrew.check(config.brewfile);
   if (allInstalled.isErr()) {
     return err(allInstalled.error);
   }
 
   // Remove cached downloads and old versions, runs after install/upgrade so old versions are gone too
-  log.step(pc.bold("Removing cache"));
+  log.step(styleText("bold", "Removing cache"));
   const cache = await homebrew.cleanupCache();
   if (cache.isErr()) {
     return err(cache.error);
