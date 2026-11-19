@@ -1,6 +1,7 @@
 import { appendFileSync, rmSync, writeFileSync } from "node:fs";
 import { homedir } from "node:os";
 import { resolve } from "node:path";
+import { stripVTControlCharacters } from "node:util";
 import {
   intro as clackIntro,
   log as clackLog,
@@ -8,9 +9,6 @@ import {
 } from "@clack/prompts";
 
 const FILE = resolve(`${homedir()}/.hops.log`);
-
-// biome-ignore lint/suspicious/noControlCharactersInRegex: ANSI codes start with the ESC control character by definition.
-const ANSI = /\x1B\[[0-9;]*m/g;
 
 let on = true;
 let warned = false;
@@ -21,7 +19,7 @@ const write = (text: string): void => {
   }
 
   try {
-    appendFileSync(FILE, `${text.replace(ANSI, "")}\n`);
+    appendFileSync(FILE, `${stripVTControlCharacters(text)}\n`);
   } catch {
     if (!warned) {
       warned = true;

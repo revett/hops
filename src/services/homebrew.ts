@@ -1,6 +1,6 @@
+import { styleText } from "node:util";
 import { execa } from "execa";
 import { err, ok, type Result } from "neverthrow";
-import pc from "picocolors";
 import { capture, log, output } from "../utils/logger";
 
 export function createEnv(brewfilePath: string): Record<string, string> {
@@ -201,7 +201,7 @@ export async function listFloatingPackages(
   const names = Object.values(floating).flat().sort();
   const lines = [
     ...names.map((n) => `${prefix} ${n}`),
-    ...ignored.sort().map((n) => pc.dim(`${prefix} ${n} (ignored)`)),
+    ...ignored.sort().map((n) => styleText("dim", `${prefix} ${n} (ignored)`)),
   ];
   if (lines.length > 0) {
     log.info(lines.join("\n"));

@@ -1,5 +1,5 @@
+import { styleText } from "node:util";
 import { err, ok, type Result } from "neverthrow";
-import pc from "picocolors";
 import type { Command } from "../types/command";
 import { getConfig, getLastApplyTime } from "../utils/config";
 import { output } from "../utils/logger";
@@ -32,7 +32,8 @@ const action: () => Promise<Result<void, Error>> = async () => {
   if (timeSinceLastApply >= reminderMs) {
     const daysSince = Math.floor(timeSinceLastApply / (24 * 60 * 60 * 1000));
     output(
-      pc.yellow(
+      styleText(
+        "yellow",
         `🍺 hops → ${daysSince} day${daysSince === 1 ? "" : "s"} since last apply`,
       ),
     );

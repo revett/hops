@@ -20,7 +20,7 @@
 - `neverthrow` Result types for all fallible operations
 - `@clack/prompts` for all user-facing output, imported via `src/utils/logger.ts` (not directly) so
   output is mirrored to the run log
-- `picocolors` for text styling
+- `styleText` from `node:util` for text styling, the same as clack uses, so colour detection matches
 - `shared` is a reserved machine name, merged with the target machine during generation
 - `ignore` lists packages managed outside hops; they are excluded from the Brewfile and filtered
   out of the floating package check, and a package cannot be both listed and ignored

@@ -1,6 +1,6 @@
+import { styleText } from "node:util";
 import { confirm, isCancel } from "@clack/prompts";
 import { err, ok, type Result } from "neverthrow";
-import pc from "picocolors";
 import { findDuplicates, generateBrewfile } from "../services/brewfile";
 import { formatConfig } from "../services/format";
 import type { Command } from "../types/command";
@@ -13,8 +13,8 @@ type GenerateOptions = {
 
 const action: (options: GenerateOptions) => Promise<Result<void, Error>> =
   async (options) => {
-    intro(pc.bgGreen(pc.bold("hops")));
-    log.step(pc.bold("Reading hops.yml"));
+    intro(styleText(["bgGreen", "bold"], "hops"));
+    log.step(styleText("bold", "Reading hops.yml"));
 
     if (!options.machine) {
       return err(new Error("Machine flag is required"));
@@ -39,7 +39,7 @@ const action: (options: GenerateOptions) => Promise<Result<void, Error>> =
       ].join("\n"),
     );
 
-    log.step(pc.bold("Formatting"));
+    log.step(styleText("bold", "Formatting"));
     const formatResult = await formatConfig(path);
     if (formatResult.isErr()) {
       return err(formatResult.error);
@@ -53,7 +53,7 @@ const action: (options: GenerateOptions) => Promise<Result<void, Error>> =
 
     const duplicates = findDuplicates(config.machines);
     if (duplicates.length > 0) {
-      log.warn(pc.bold("Duplicates found in hops.yml"));
+      log.warn(styleText("bold", "Duplicates found in hops.yml"));
       log.info(duplicates.map((d) => `- ${d}`).join("\n"));
 
       const shouldContinue = await confirm({
@@ -61,7 +61,7 @@ const action: (options: GenerateOptions) => Promise<Result<void, Error>> =
       });
 
       if (isCancel(shouldContinue) || !shouldContinue) {
-        log.error(pc.bold("Exiting early"));
+        log.error(styleText("bold", "Exiting early"));
         process.exit(0);
       }
     }
@@ -76,7 +76,7 @@ const action: (options: GenerateOptions) => Promise<Result<void, Error>> =
       return err(generate.error);
     }
 
-    outro(pc.bold("Done"));
+    outro(styleText("bold", "Done"));
     return ok(undefined);
   };
 

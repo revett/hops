@@ -1,7 +1,7 @@
 import { writeFile } from "node:fs/promises";
 import { homedir } from "node:os";
+import { styleText } from "node:util";
 import { err, ok, type Result } from "neverthrow";
-import pc from "picocolors";
 import YAML from "yaml";
 import type { Command } from "../types/command";
 import type { Config } from "../types/config";
@@ -28,8 +28,8 @@ const defaultConfig: Config = {
 };
 
 const action: () => Promise<Result<void, Error>> = async () => {
-  intro(pc.bgGreen(pc.bold("hops")));
-  log.step(pc.bold("Initializing new hops.yml config"));
+  intro(styleText(["bgGreen", "bold"], "hops"));
+  log.step(styleText("bold", "Initializing new hops.yml config"));
 
   const path = getConfigPath();
 
